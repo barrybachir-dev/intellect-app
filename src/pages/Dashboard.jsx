@@ -21,8 +21,15 @@ export function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { user, logout } = useAppContext();
   const navigate = useNavigate();
+
+  const handleSearch = event => {
+    event.preventDefault();
+    const query = searchQuery.trim();
+    if (query) navigate(`/dashboard/resumes?search=${encodeURIComponent(query)}`);
+  };
 
   const initials = user.firstName && user.lastName
     ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
@@ -47,7 +54,7 @@ export function Dashboard() {
             >
               <Menu size={24} />
             </button>
-            <div className="header-search" style={{
+            <form className="header-search" onSubmit={handleSearch} style={{
               display: 'flex', alignItems: 'center', gap: '0.5rem',
               backgroundColor: 'var(--bg-card)', padding: '0.5rem 1rem',
               borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)',
@@ -57,9 +64,11 @@ export function Dashboard() {
               <input
                 type="text"
                 placeholder="Rechercher dans tes notes, résumés..."
+                value={searchQuery}
+                onChange={event => setSearchQuery(event.target.value)}
                 style={{ background: 'none', border: 'none', color: 'var(--text-primary)', outline: 'none', width: '100%', fontSize: '0.9rem' }}
               />
-            </div>
+            </form>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
