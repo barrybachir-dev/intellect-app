@@ -5,7 +5,7 @@ import { Button } from '../components/Button';
 import { useAppContext } from '../context/AppContext';
 
 export function Auth() {
-  const { login, register } = useAppContext();
+  const { login, register, resetPassword } = useAppContext();
   const navigate = useNavigate();
   const oauthProviders = {
     google: import.meta.env.VITE_ENABLE_GOOGLE_AUTH === 'true',
@@ -23,6 +23,7 @@ export function Auth() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const handleChange = (field) => (e) => {
     setForm(prev => ({ ...prev, [field]: e.target.value }));
@@ -78,6 +79,24 @@ export function Auth() {
         setError(authError.message || 'Impossible de démarrer la connexion.');
         setLoading(false);
       });
+  };
+
+  const handlePasswordReset = async (event) => {
+    event.preventDefault();
+    if (!form.email) {
+      setError('Entre ton email pour recevoir le lien de réinitialisation.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await resetPassword(form.email);
+      setResetSent(true);
+    } catch (resetError) {
+      setError(resetError.message || 'Impossible d’envoyer le lien de réinitialisation.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputStyle = {
@@ -224,7 +243,7 @@ export function Auth() {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
                 <label style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>Mot de passe *</label>
-                {mode === 'login' && <a href="#" style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>Oublié ?</a>}
+                {mode === 'login' && <button type="button" onClick={handlePasswordReset} style={{ background: 'none', border: 'none', padding: 0, fontSize: '0.8rem', color: 'var(--accent-cyan)', cursor: 'pointer' }}>Oublié ?</button>}
               </div>
               <input type="password" placeholder="••••••••" value={form.password} onChange={handleChange('password')} style={inputStyle} required />
             </div>
@@ -241,6 +260,10 @@ export function Auth() {
                 {error}
               </div>
             )}
+
+            {resetSent && <div style={{ padding: '0.75rem 1rem', backgroundColor: 'rgba(74, 222, 128, 0.1)', border: '1px solid rgba(74, 222, 128, 0.3)', borderRadius: 'var(--radius-sm)', color: '#4ade80', fontSize: '0.875rem' }}>
+              Vérifie ta boîte email pour réinitialiser ton mot de passe.
+            </div>}
 
             <Button variant="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }} disabled={loading}>
               {loading ? 'Connexion...' : mode === 'login' ? 'Se connecter' : 'Créer mon compte'}

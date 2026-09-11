@@ -30,7 +30,7 @@ export function Landing() {
               Commencer gratuitement <span style={{ marginLeft: '0.5rem' }}>→</span>
             </Button>
           </Link>
-          <Button variant="secondary" style={{ padding: '1rem 2rem', fontSize: '1.125rem' }}>
+          <Button variant="secondary" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} style={{ padding: '1rem 2rem', fontSize: '1.125rem' }}>
             Voir la démo
           </Button>
         </div>

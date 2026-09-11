@@ -159,10 +159,17 @@ export function AppProvider({ children }) {
     if (error) throw error;
   };
 
+  const resetPassword = async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/dashboard/settings`,
+    });
+    if (error) throw error;
+  };
+
   // ────────── Upload / Limits ──────────
   const canUpload = () => usage.resumesCount < usage.resumesLimit || user.plan === 'Pro';
 
-  const processDocument = async (fileData) => {
+  const processDocument = async (fileData, generationMode = 'all') => {
     const { data: { user: authenticatedUser } } = await supabase.auth.getUser();
     if (!authenticatedUser) throw new Error('Votre session a expire.');
 
@@ -192,7 +199,7 @@ export function AppProvider({ children }) {
     }
 
     const { data: functionData, error: functionError } = await supabase.functions.invoke('process-document', {
-      body: JSON.stringify({ resumeId: String(resumeId) }),
+      body: JSON.stringify({ resumeId: String(resumeId), mode: generationMode }),
       headers: { 'Content-Type': 'application/json' },
     });
     if (functionError) {
@@ -215,8 +222,30 @@ export function AppProvider({ children }) {
     ]);
     if (resume) setResumes(prev => [{ ...resume, pages: resume.page_count, time: new Date(resume.created_at).toLocaleDateString('fr-FR'), keypoints: resume.keypoints || [] }, ...prev]);
     if (quiz) setQuizzes(prev => [{ ...quiz, resumeId: quiz.resume_id, questions: quiz.questions || [] }, ...prev]);
+    if (functionData?.generatedNote) setNotes(prev => [functionData.generatedNote, ...prev]);
     setUsage(prev => ({ ...prev, resumesCount: prev.resumesCount + 1 }));
     return resumeId;
+  };
+
+  const generateForResume = async (resumeId, mode) => {
+    const { data, error } = await supabase.functions.invoke('process-document', {
+      body: JSON.stringify({ resumeId: String(resumeId), mode }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+
+    const [{ data: quiz }, { data: resume }] = await Promise.all([
+      supabase.from('quizzes').select('*').eq('resume_id', resumeId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+      supabase.from('resumes').select('*').eq('id', resumeId).single(),
+    ]);
+    if (resume) {
+      setResumes(prev => prev.map(item => item.id === resume.id ? { ...item, ...resume, pages: resume.page_count, time: new Date(resume.created_at).toLocaleDateString('fr-FR'), keypoints: resume.keypoints || [] } : item));
+    }
+    if (quiz) {
+      setQuizzes(prev => prev.some(item => item.id === quiz.id) ? prev : [{ ...quiz, resumeId: quiz.resume_id, questions: quiz.questions || [] }, ...prev]);
+    }
+    if (data?.generatedNote) setNotes(prev => [data.generatedNote, ...prev]);
   };
 
   const submitQuiz = async (quizId, scorePct) => {
@@ -259,9 +288,9 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
-      isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword,
+      isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword, resetPassword,
       user, setUser,
-      usage, canUpload, processDocument, submitQuiz,
+      usage, canUpload, processDocument, generateForResume, submitQuiz,
       resumes, quizzes, notes, addNote, recentActivity,
       stats,
     }}>

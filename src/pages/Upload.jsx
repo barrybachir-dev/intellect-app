@@ -13,6 +13,7 @@ export function Upload() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [error, setError] = useState('');
   const [processingStage, setProcessingStage] = useState('');
+  const [generationMode, setGenerationMode] = useState('all');
 
   const handleProcessFile = (file) => {
     if (!canUpload()) {
@@ -23,7 +24,7 @@ export function Upload() {
     setError('');
     setProcessingStage('Téléchargement du PDF…');
     setIsUploading(true);
-    processDocument(file)
+    processDocument(file, generationMode)
       .then(resumeId => navigate('/dashboard/resumes/' + resumeId))
       .catch(uploadError => {
         setError(uploadError.message || 'Le traitement du document a echoue.');
@@ -76,6 +77,23 @@ export function Upload() {
         <h1 className="text-4xl font-bold" style={{ margin: '0.5rem 0' }}>Upload un <span className="text-gradient">PDF</span></h1>
         <p style={{ color: 'var(--text-secondary)' }}>Glisse ton document de cours pour générer un résumé et un quiz.</p>
       </header>
+
+      <fieldset style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1rem' }}>
+        <legend style={{ padding: '0 0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Que veux-tu préparer ?</legend>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.75rem' }}>
+          {[
+            ['summary', 'Résumé seul'],
+            ['quiz', 'Quiz seul'],
+            ['notes', 'Notes seules'],
+            ['all', 'Tout'],
+          ].map(([value, label]) => (
+            <label key={value} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem', border: `1px solid ${generationMode === value ? 'var(--accent-cyan)' : 'var(--border-color)'}`, borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>
+              <input type="radio" name="generationMode" value={value} checked={generationMode === value} onChange={e => setGenerationMode(e.target.value)} />
+              {label}
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
       {error && <div style={{ padding: '0.75rem 1rem', marginBottom: '1rem', color: '#f87171', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-sm)' }}>{error}</div>}
 

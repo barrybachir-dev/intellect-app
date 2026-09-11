@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
 import { DashboardOverview } from './DashboardOverview';
 import { Upload } from './Upload';
@@ -9,12 +9,14 @@ import { QuizList } from './QuizList';
 import { QuizExecution } from './QuizExecution';
 import { Notes } from './Notes';
 import { Settings } from './Settings';
+import { ReviewBySubject } from './ReviewBySubject';
 import { Search, Bell, Menu } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 export function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user } = useAppContext();
+  const navigate = useNavigate();
 
   const initials = user.firstName && user.lastName
     ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
@@ -53,12 +55,16 @@ export function Dashboard() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <div style={{ position: 'relative', cursor: 'pointer' }}>
+            <button type="button" aria-label="Voir les notifications" onClick={() => navigate('/dashboard/settings')} style={{ position: 'relative', cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}>
               <Bell size={20} color="var(--text-secondary)" />
               <div style={{ position: 'absolute', top: -2, right: -2, width: '8px', height: '8px', backgroundColor: 'var(--accent-cyan)', borderRadius: '50%' }}></div>
-            </div>
+            </button>
             <div
               title={user.firstName ? `${user.firstName} ${user.lastName}` : 'Profil'}
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate('/dashboard/settings')}
+              onKeyDown={event => event.key === 'Enter' && navigate('/dashboard/settings')}
               style={{
                 width: '2.5rem', height: '2.5rem', borderRadius: '50%',
                 background: 'var(--gradient-primary)',
@@ -76,6 +82,7 @@ export function Dashboard() {
           <Route path="/upload" element={<Upload />} />
           <Route path="/resumes" element={<Resumes />} />
           <Route path="/resumes/:id" element={<ResumeDetail />} />
+          <Route path="/review" element={<ReviewBySubject />} />
           <Route path="/quiz" element={<QuizList />} />
           <Route path="/quiz/:id" element={<QuizExecution />} />
           <Route path="/notes" element={<Notes />} />

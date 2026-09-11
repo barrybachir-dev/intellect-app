@@ -1,16 +1,17 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, UploadCloud, FileText, Brain, FolderOpen, Settings, Sparkles, X } from 'lucide-react';
+import { LayoutDashboard, UploadCloud, FileText, Brain, FolderOpen, Settings, Sparkles, X, BookOpen } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 export function Sidebar({ isOpen, onClose }) {
   const { user } = useAppContext();
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', path: '/dashboard' },
-    { icon: <UploadCloud size={20} />, label: 'Upload PDF', path: '/dashboard/upload' },
-    { icon: <FileText size={20} />, label: 'Résumés', path: '/dashboard/resumes' },
-    { icon: <Brain size={20} />, label: 'Quiz', path: '/dashboard/quiz' },
-    { icon: <FolderOpen size={20} />, label: 'Notes', path: '/dashboard/notes' },
+    { icon: <UploadCloud size={20} />, label: 'Importer un document', path: '/dashboard/upload' },
+    { icon: <FileText size={20} />, label: 'Bibliothèque', path: '/dashboard/resumes' },
+    { icon: <BookOpen size={20} />, label: 'Réviser par matière', path: '/dashboard/review' },
+    { icon: <Brain size={20} />, label: 'Mes quiz', path: '/dashboard/quiz' },
+    { icon: <FolderOpen size={20} />, label: 'Mes notes', path: '/dashboard/notes' },
   ];
 
   return (

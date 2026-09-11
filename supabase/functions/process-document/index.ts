@@ -33,6 +33,7 @@ Deno.serve(async request => {
     if (userError || !user) throw new Error('Session invalide.')
 
     const requestBody = await request.json()
+    const mode = ['summary', 'quiz', 'notes', 'all'].includes(requestBody?.mode) ? requestBody.mode : 'all'
     resumeId = requestBody?.resumeId || requestBody?.id
     if (!resumeId) throw new Error('Identifiant de document manquant.')
     const { data: resume, error: resumeError } = await supabase
@@ -110,15 +111,28 @@ Deno.serve(async request => {
     }).eq('id', resume.id)
     if (updateError) throw updateError
 
-    const { error: quizError } = await supabase.from('quizzes').insert({
-      user_id: user.id,
-      resume_id: resume.id,
-      title: `Quiz : ${resume.title}`,
-      questions: result.questions,
-    })
-    if (quizError) throw quizError
+    let generatedNote
+    if (mode === 'quiz' || mode === 'all') {
+      const { error: quizError } = await supabase.from('quizzes').insert({
+        user_id: user.id,
+        resume_id: resume.id,
+        title: `Quiz : ${resume.title}`,
+        questions: result.questions,
+      })
+      if (quizError) throw quizError
+    }
+    if (mode === 'notes' || mode === 'all') {
+      const { data: note, error: noteError } = await supabase.from('notes').insert({
+        user_id: user.id,
+        title: `Fiche : ${resume.title}`,
+        subject: result.subject,
+        content: result.content,
+      }).select().single()
+      if (noteError) throw noteError
+      generatedNote = { ...note, date: new Date(note.created_at).toLocaleDateString('fr-FR') }
+    }
 
-    return new Response(JSON.stringify({ success: true }), { headers: jsonHeaders })
+    return new Response(JSON.stringify({ success: true, generatedNote }), { headers: jsonHeaders })
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue.'
     if (resumeId) {

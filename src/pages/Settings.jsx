@@ -66,6 +66,7 @@ export function Settings() {
   });
   const [saved, setSaved] = useState(false);
   const [securityMessage, setSecurityMessage] = useState('');
+  const [billingMessage, setBillingMessage] = useState('');
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
@@ -303,6 +304,7 @@ export function Settings() {
                       variant={isCurrent ? 'secondary' : 'primary'}
                       style={{ width: '100%' }}
                       disabled={isCurrent}
+                      onClick={() => setBillingMessage(`Le changement vers le plan ${plan.name} sera disponible prochainement.`)}
                     >
                       {isCurrent ? 'Plan actuel' : `Choisir ${plan.name}`}
                     </Button>
@@ -310,6 +312,7 @@ export function Settings() {
                 );
               })}
             </div>
+            {billingMessage && <p style={{ color: 'var(--text-secondary)', marginTop: '1rem', fontSize: '0.875rem' }}>{billingMessage}</p>}
           </div>
         </div>
       )}
@@ -350,7 +353,7 @@ export function Settings() {
           <div style={{ marginTop: '3rem', padding: '1.5rem', backgroundColor: 'rgba(239, 68, 68, 0.05)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
             <h3 style={{ color: '#f87171', fontWeight: 'bold', marginBottom: '0.5rem' }}>Zone de danger</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '1rem' }}>La suppression de votre compte est irréversible et effacera toutes vos données.</p>
-            <Button variant="secondary" style={{ borderColor: 'rgba(239, 68, 68, 0.4)', color: '#f87171' }}>
+            <Button type="button" variant="secondary" onClick={() => setSecurityMessage('La suppression du compte doit être confirmée par le support pour protéger tes données.')} style={{ borderColor: 'rgba(239, 68, 68, 0.4)', color: '#f87171' }}>
               Supprimer mon compte
             </Button>
           </div>

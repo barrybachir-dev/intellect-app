@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Card } from '../components/Card';
@@ -8,10 +8,24 @@ import { useAppContext } from '../context/AppContext';
 export function ResumeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { resumes, quizzes } = useAppContext();
+  const { resumes, quizzes, generateForResume } = useAppContext();
+  const [generatingMode, setGeneratingMode] = useState('');
+  const [generationError, setGenerationError] = useState('');
   
   const resume = resumes.find(r => String(r.id) === id);
   const relatedQuiz = quizzes.find(q => String(q.resumeId) === id);
+
+  const handleGenerate = async (mode) => {
+    setGeneratingMode(mode);
+    setGenerationError('');
+    try {
+      await generateForResume(id, mode);
+    } catch (error) {
+      setGenerationError(error.message || 'Impossible de préparer ce contenu.');
+    } finally {
+      setGeneratingMode('');
+    }
+  };
 
   if (!resume) {
     return <div>Résumé introuvable.</div>;
@@ -43,6 +57,18 @@ export function ResumeDetail() {
               </Button>
             </Link>
           )}
+          {!relatedQuiz && (
+            <Button variant="secondary" style={{ padding: '0.5rem 1rem' }} onClick={() => handleGenerate('quiz')} disabled={Boolean(generatingMode)}>
+              {generatingMode === 'quiz' ? 'Préparation...' : 'Créer le quiz'}
+            </Button>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+          <Button variant="secondary" onClick={() => handleGenerate('notes')} disabled={Boolean(generatingMode)}>
+            {generatingMode === 'notes' ? 'Préparation...' : 'Créer une fiche de notes'}
+          </Button>
+          {generationError && <span style={{ color: '#f87171', fontSize: '0.875rem' }}>{generationError}</span>}
         </div>
 
         <div style={{ margin: '2.5rem 0' }}>
