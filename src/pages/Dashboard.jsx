@@ -15,6 +15,7 @@ import { useAppContext } from '../context/AppContext';
 
 export function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { user } = useAppContext();
   const navigate = useNavigate();
 
@@ -55,25 +56,41 @@ export function Dashboard() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <button type="button" aria-label="Voir les notifications" onClick={() => navigate('/dashboard/settings')} style={{ position: 'relative', cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}>
+            <div style={{ position: 'relative' }}>
+              <button
+                type="button"
+                aria-label="Voir les notifications"
+                aria-expanded={notificationsOpen}
+                onClick={() => setNotificationsOpen(open => !open)}
+                style={{ position: 'relative', cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0, display: 'flex' }}
+              >
               <Bell size={20} color="var(--text-secondary)" />
               <div style={{ position: 'absolute', top: -2, right: -2, width: '8px', height: '8px', backgroundColor: 'var(--accent-cyan)', borderRadius: '50%' }}></div>
-            </button>
-            <div
+              </button>
+              {notificationsOpen && (
+                <div style={{ position: 'absolute', top: '2rem', right: 0, width: '240px', padding: '1rem', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', boxShadow: '0 12px 30px rgba(0,0,0,0.25)', zIndex: 20 }}>
+                  <div style={{ fontWeight: 'bold', marginBottom: '0.35rem' }}>Notifications</div>
+                  <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Aucune nouvelle notification.</p>
+                  <button type="button" onClick={() => { setNotificationsOpen(false); navigate('/dashboard/settings'); }} style={{ marginTop: '0.75rem', padding: 0, border: 0, background: 'none', color: 'var(--accent-cyan)', cursor: 'pointer', fontSize: '0.8rem' }}>
+                    Gérer les notifications
+                  </button>
+                </div>
+              )}
+            </div>
+            <button
+              type="button"
               title={user.firstName ? `${user.firstName} ${user.lastName}` : 'Profil'}
-              role="button"
-              tabIndex={0}
+              aria-label="Ouvrir mon profil"
               onClick={() => navigate('/dashboard/settings')}
-              onKeyDown={event => event.key === 'Enter' && navigate('/dashboard/settings')}
               style={{
                 width: '2.5rem', height: '2.5rem', borderRadius: '50%',
                 background: 'var(--gradient-primary)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', fontWeight: 'bold', fontSize: '0.875rem', color: '#0d0e1a'
+                cursor: 'pointer', fontWeight: 'bold', fontSize: '0.875rem', color: '#0d0e1a', border: 'none'
               }}
             >
               {initials}
-            </div>
+            </button>
           </div>
         </header>
 
