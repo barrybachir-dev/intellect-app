@@ -1,12 +1,16 @@
 import React from 'react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { FileText, Brain, FolderOpen, TrendingUp, Upload, ArrowRight } from 'lucide-react';
+import { FileText, Brain, FolderOpen, TrendingUp, Upload, ArrowRight, CalendarDays } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { Link } from 'react-router-dom';
 
 export function DashboardOverview() {
   const { user, stats, recentActivity } = useAppContext();
+  const upcomingEvents = (user.exams || [])
+    .filter(event => event.date >= new Date().toISOString().slice(0, 10))
+    .sort((first, second) => first.date.localeCompare(second.date))
+    .slice(0, 3);
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -20,7 +24,6 @@ export function DashboardOverview() {
         <Card style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <div className="btn-icon" style={{ width: '2rem', height: '2rem' }}><FileText size={16} color="var(--accent-cyan)" /></div>
-            {stats.resumes > 0 && <span style={{ color: 'var(--accent-cyan)', fontSize: '0.875rem', fontWeight: 'bold' }}>+12%</span>}
           </div>
           <div className="text-3xl font-bold">{stats.resumes}</div>
           <div className="text-secondary text-sm">Résumés</div>
@@ -28,7 +31,6 @@ export function DashboardOverview() {
         <Card style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <div className="btn-icon" style={{ width: '2rem', height: '2rem' }}><Brain size={16} color="var(--accent-cyan)" /></div>
-            {stats.quizzes > 0 && <span style={{ color: 'var(--accent-cyan)', fontSize: '0.875rem', fontWeight: 'bold' }}>+8%</span>}
           </div>
           <div className="text-3xl font-bold">{stats.quizzes}</div>
           <div className="text-secondary text-sm">Quiz complétés</div>
@@ -36,7 +38,6 @@ export function DashboardOverview() {
         <Card style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <div className="btn-icon" style={{ width: '2rem', height: '2rem' }}><FolderOpen size={16} color="var(--accent-cyan)" /></div>
-            {stats.notes > 0 && <span style={{ color: 'var(--accent-cyan)', fontSize: '0.875rem', fontWeight: 'bold' }}>+24%</span>}
           </div>
           <div className="text-3xl font-bold">{stats.notes}</div>
           <div className="text-secondary text-sm">Notes</div>
@@ -44,7 +45,6 @@ export function DashboardOverview() {
         <Card style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <div className="btn-icon" style={{ width: '2rem', height: '2rem' }}><TrendingUp size={16} color="var(--accent-cyan)" /></div>
-            {stats.score > 0 && <span style={{ color: 'var(--accent-cyan)', fontSize: '0.875rem', fontWeight: 'bold' }}>+3%</span>}
           </div>
           <div className="text-3xl font-bold">{stats.score}%</div>
           <div className="text-secondary text-sm">Score moyen</div>
@@ -77,6 +77,29 @@ export function DashboardOverview() {
                     <div style={{ fontWeight: 'bold' }}>{activity.title}</div>
                     <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{activity.meta}</div>
                   </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
+        <Card>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h2 className="text-xl font-bold">Prochaines échéances</h2>
+            <Link to="/dashboard/calendar" style={{ color: 'var(--accent-cyan)', fontSize: '0.875rem' }}>Calendrier</Link>
+          </div>
+          {upcomingEvents.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+              <CalendarDays size={36} color="var(--border-color)" style={{ marginBottom: '0.75rem' }} />
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>Aucune échéance enregistrée.</p>
+              <Link to="/dashboard/calendar"><Button variant="secondary">Ajouter une date</Button></Link>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {upcomingEvents.map(event => (
+                <div key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', backgroundColor: 'var(--bg-input)', borderRadius: 'var(--radius-md)' }}>
+                  <CalendarDays size={18} color="var(--accent-cyan)" />
+                  <div><div style={{ fontWeight: '600' }}>{event.title}</div><div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{new Date(`${event.date}T00:00:00`).toLocaleDateString('fr-FR')} · {event.type}</div></div>
                 </div>
               ))}
             </div>
