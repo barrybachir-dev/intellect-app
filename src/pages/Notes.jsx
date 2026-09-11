@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FolderOpen, Plus, X, BookOpen } from 'lucide-react';
+import { FolderOpen, Plus, X, BookOpen, Download } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { useAppContext } from '../context/AppContext';
@@ -20,6 +20,17 @@ export function Notes() {
     });
     setForm({ title: '', subject: '', content: '' });
     setShowModal(false);
+  };
+
+  const downloadNote = note => {
+    const markdown = `# ${note.title}\n\n**Matière :** ${note.subject || 'Général'}\n\n${note.content}`;
+    const file = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${note.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'note'}.md`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const notesBySubject = notes.reduce((acc, note) => {
@@ -156,6 +167,9 @@ export function Notes() {
             <h2 className="text-2xl font-bold" style={{ marginBottom: '1rem' }}>{selectedNote.title}</h2>
             <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>{selectedNote.content}</p>
             <div style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{selectedNote.date}</div>
+            <Button variant="secondary" onClick={() => downloadNote(selectedNote)} style={{ marginTop: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Download size={16} /> Exporter en Markdown
+            </Button>
           </Card>
         </div>
       )}
