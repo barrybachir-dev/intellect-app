@@ -93,7 +93,7 @@ export function Dashboard() {
                 cursor: 'pointer', fontWeight: 'bold', fontSize: '0.875rem', color: '#0d0e1a', border: 'none'
               }}
             >
-              {initials}
+              {user.avatarUrl ? <img src={user.avatarUrl} alt="Profil" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} /> : initials}
             </button>
             {profileOpen && (
               <div style={{ position: 'absolute', top: '3.5rem', right: '2rem', width: '230px', padding: '0.75rem', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', boxShadow: '0 12px 30px rgba(0,0,0,0.25)', zIndex: 20 }}>

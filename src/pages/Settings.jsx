@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { User, CreditCard, Bell, Shield, Check, Sparkles, Lock } from 'lucide-react';
+import { User, CreditCard, Bell, Shield, Check, Sparkles, Lock, Camera } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { useAppContext } from '../context/AppContext';
@@ -55,7 +55,7 @@ const PLANS = [
 ];
 
 export function Settings() {
-  const { user, usage, logout, updateProfile, updatePassword } = useAppContext();
+  const { user, usage, logout, updateProfile, updatePassword, updateAvatar, updateNotifications } = useAppContext();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'profile');
   const [formData, setFormData] = useState({
@@ -69,6 +69,37 @@ export function Settings() {
   const [saved, setSaved] = useState(false);
   const [securityMessage, setSecurityMessage] = useState('');
   const [billingMessage, setBillingMessage] = useState('');
+  const [avatarMessage, setAvatarMessage] = useState('');
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const notificationOptions = [
+    { key: 'studyReminders', label: 'Rappels de révision', desc: 'Recevoir des rappels quotidiens pour réviser vos notes.' },
+    { key: 'quizResults', label: 'Résultats de quiz', desc: 'Notification après chaque quiz complété.' },
+    { key: 'productUpdates', label: 'Nouveautés produit', desc: "Soyez informé des nouvelles fonctionnalités d'Intellect." },
+    { key: 'resumeReady', label: 'Résumés prêts', desc: 'Notification quand votre résumé PDF est généré.' },
+  ];
+
+  const handleAvatarChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setAvatarMessage('');
+    try {
+      await updateAvatar(file);
+      setAvatarMessage('Photo de profil mise à jour.');
+    } catch (error) {
+      setAvatarMessage(error.message || 'Impossible de mettre à jour la photo.');
+    }
+    event.target.value = '';
+  };
+
+  const handleNotificationChange = async (key, checked) => {
+    const notifications = { ...user.notifications, [key]: checked };
+    setNotificationMessage('');
+    try {
+      await updateNotifications(notifications);
+    } catch (error) {
+      setNotificationMessage(error.message || 'Impossible de sauvegarder cette préférence.');
+    }
+  };
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
@@ -157,7 +188,7 @@ export function Settings() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '1.75rem', fontWeight: 'bold', color: '#fff', flexShrink: 0
             }}>
-              {formData.firstName ? formData.firstName[0].toUpperCase() : '?'}
+              {user.avatarUrl ? <img src={user.avatarUrl} alt="Photo de profil" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} /> : (formData.firstName ? formData.firstName[0].toUpperCase() : 'U')}
             </div>
             <div>
               <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>
@@ -165,6 +196,11 @@ export function Settings() {
               </div>
               <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>{formData.email || 'email@exemple.com'}</div>
               <span className="badge">{user.plan || 'Free'}</span>
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', marginLeft: '0.5rem', color: 'var(--accent-cyan)', cursor: 'pointer', fontSize: '0.8rem' }}>
+                <Camera size={14} /> Modifier la photo
+                <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handleAvatarChange} style={{ display: 'none' }} />
+              </label>
+              {avatarMessage && <div style={{ color: avatarMessage.includes('mise à jour') ? '#4ade80' : '#f87171', fontSize: '0.8rem', marginTop: '0.5rem' }}>{avatarMessage}</div>}
             </div>
           </div>
 
@@ -368,12 +404,7 @@ export function Settings() {
           <h2 className="text-xl font-bold" style={{ marginBottom: '0.5rem' }}>Préférences de notifications</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.875rem' }}>Choisissez quand et comment Intellect vous contacte.</p>
 
-          {[
-            { label: 'Rappels de révision', desc: 'Recevoir des rappels quotidiens pour réviser vos notes.' },
-            { label: 'Résultats de quiz', desc: 'Notification après chaque quiz complété.' },
-            { label: 'Nouveautés produit', desc: "Soyez informé des nouvelles fonctionnalités d'Intellect." },
-            { label: 'Résumés prêts', desc: 'Notification quand votre résumé PDF est généré.' },
-          ].map((item, i) => (
+          {notificationOptions.map((item, i) => (
             <div key={i} style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
               padding: '1.25rem 0', borderBottom: i < 3 ? '1px solid var(--border-color)' : 'none'
@@ -383,20 +414,21 @@ export function Settings() {
                 <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{item.desc}</div>
               </div>
               <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer' }}>
-                <input type="checkbox" defaultChecked={i < 2} style={{ opacity: 0, width: 0, height: 0 }} />
+                <input type="checkbox" checked={Boolean(user.notifications?.[item.key])} onChange={event => handleNotificationChange(item.key, event.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
                 <span style={{
-                  position: 'absolute', inset: 0, backgroundColor: i < 2 ? 'var(--accent-cyan)' : 'var(--bg-input)',
+                  position: 'absolute', inset: 0, backgroundColor: user.notifications?.[item.key] ? 'var(--accent-cyan)' : 'var(--bg-input)',
                   borderRadius: '24px', transition: '0.3s',
                   border: '1px solid var(--border-color)'
                 }} />
                 <span style={{
-                  position: 'absolute', top: '3px', left: i < 2 ? '22px' : '3px',
+                  position: 'absolute', top: '3px', left: user.notifications?.[item.key] ? '22px' : '3px',
                   width: '18px', height: '18px', backgroundColor: 'white',
                   borderRadius: '50%', transition: '0.3s'
                 }} />
               </label>
             </div>
           ))}
+          {notificationMessage && <p style={{ color: '#f87171', fontSize: '0.875rem', marginTop: '1rem' }}>{notificationMessage}</p>}
         </Card>
       )}
     </div>

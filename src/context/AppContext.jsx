@@ -17,6 +17,13 @@ export function AppProvider({ children }) {
     email: '',
     plan: 'Free',
     university: '',
+    avatarUrl: '',
+    notifications: {
+      studyReminders: true,
+      quizResults: true,
+      productUpdates: false,
+      resumeReady: true,
+    },
     authProvider: null, // 'email' | 'google' | 'github'
   });
 
@@ -39,6 +46,12 @@ export function AppProvider({ children }) {
       if (mounted) {
         setIsLoggedIn(Boolean(session));
         if (session) {
+          const metadata = session.user.user_metadata || {};
+          let avatarUrl = '';
+          if (metadata.avatarPath) {
+            const { data: avatar } = await supabase.storage.from('documents').createSignedUrl(metadata.avatarPath, 60 * 60);
+            avatarUrl = avatar?.signedUrl || '';
+          }
           const [{ data: profile }, { data: resumeRows }, { data: quizRows }, { data: noteRows }] = await Promise.all([
             supabase.from('profiles').select('*').eq('id', session.user.id).single(),
             supabase.from('resumes').select('*').order('created_at', { ascending: false }),
@@ -51,6 +64,13 @@ export function AppProvider({ children }) {
             email: session.user.email || '',
             plan: profile?.plan || 'Free',
             university: profile?.university || session.user.user_metadata?.university || '',
+            avatarUrl,
+            notifications: {
+              studyReminders: metadata.notifications?.studyReminders ?? true,
+              quizResults: metadata.notifications?.quizResults ?? true,
+              productUpdates: metadata.notifications?.productUpdates ?? false,
+              resumeReady: metadata.notifications?.resumeReady ?? true,
+            },
             authProvider: session.user.app_metadata?.provider || 'email',
           });
           setResumes((resumeRows || []).map(row => ({ ...row, pages: row.page_count, time: new Date(row.created_at).toLocaleDateString('fr-FR'), keypoints: row.keypoints || [] })));
@@ -157,6 +177,29 @@ export function AppProvider({ children }) {
   const updatePassword = async (password) => {
     const { error } = await supabase.auth.updateUser({ password });
     if (error) throw error;
+  };
+
+  const updateAvatar = async (file) => {
+    const { data: { user: authenticatedUser } } = await supabase.auth.getUser();
+    if (!authenticatedUser) throw new Error('Votre session a expire.');
+    if (!file || !file.type.startsWith('image/')) throw new Error('Choisissez une image valide.');
+    if (file.size > 5 * 1024 * 1024) throw new Error('La photo ne doit pas dépasser 5 Mo.');
+
+    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const avatarPath = `${authenticatedUser.id}/avatar-${Date.now()}.${extension}`;
+    const { error: uploadError } = await supabase.storage.from('documents').upload(avatarPath, file, { contentType: file.type, upsert: false });
+    if (uploadError) throw uploadError;
+    const { data: avatar, error: urlError } = await supabase.storage.from('documents').createSignedUrl(avatarPath, 60 * 60);
+    if (urlError) throw urlError;
+    const { error: metadataError } = await supabase.auth.updateUser({ data: { avatarPath } });
+    if (metadataError) throw metadataError;
+    setUser(prev => ({ ...prev, avatarUrl: avatar.signedUrl }));
+  };
+
+  const updateNotifications = async (notifications) => {
+    const { error } = await supabase.auth.updateUser({ data: { notifications } });
+    if (error) throw error;
+    setUser(prev => ({ ...prev, notifications }));
   };
 
   const resetPassword = async (email) => {
@@ -288,7 +331,7 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
-      isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword, resetPassword,
+      isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword, resetPassword, updateAvatar, updateNotifications,
       user, setUser,
       usage, canUpload, processDocument, generateForResume, submitQuiz,
       resumes, quizzes, notes, addNote, recentActivity,
