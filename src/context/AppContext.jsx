@@ -370,6 +370,18 @@ export function AppProvider({ children }) {
     setNotes(prev => prev.filter(note => note.id !== noteId));
   };
 
+  const updateNote = async (noteId, noteData) => {
+    const { data, error } = await supabase.from('notes').update({
+      title: noteData.title,
+      subject: noteData.subject,
+      content: noteData.content,
+      updated_at: new Date().toISOString(),
+    }).eq('id', noteId).select().single();
+    if (error) throw error;
+    const updatedNote = { ...data, date: new Date(data.created_at).toLocaleDateString('fr-FR') };
+    setNotes(prev => prev.map(note => note.id === noteId ? updatedNote : note));
+  };
+
   // ────────── Stats ──────────
   const getAverageScore = () => {
     const completed = quizzes.filter(q => q.completed);
@@ -389,7 +401,7 @@ export function AppProvider({ children }) {
       isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword, resetPassword, updateAvatar, updateNotifications, updateExams, theme, toggleTheme,
       user, setUser,
       usage, canUpload, processDocument, generateForResume, generateTopic, submitQuiz,
-      resumes, quizzes, notes, addNote, deleteNote, recentActivity,
+      resumes, quizzes, notes, addNote, updateNote, deleteNote, recentActivity,
       stats,
     }}>
       {children}

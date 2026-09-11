@@ -6,27 +6,38 @@ import { Toast } from '../components/Toast';
 import { useAppContext } from '../context/useAppContext';
 
 export function Notes() {
-  const { notes, addNote, deleteNote } = useAppContext();
+  const { notes, addNote, updateNote, deleteNote } = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ title: '', subject: '', content: '' });
   const [selectedNote, setSelectedNote] = useState(null);
+  const [editingNote, setEditingNote] = useState(null);
   const [toast, setToast] = useState('');
 
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!form.title || !form.content) return;
     try {
-      await addNote({
+      const noteData = {
         title: form.title,
         subject: form.subject.toUpperCase() || 'GEN',
         content: form.content,
-      });
+      };
+      if (editingNote) await updateNote(editingNote.id, noteData);
+      else await addNote(noteData);
       setForm({ title: '', subject: '', content: '' });
+      setEditingNote(null);
       setShowModal(false);
-      setToast('Note enregistrée.');
+      setToast(editingNote ? 'Note modifiée.' : 'Note enregistrée.');
     } catch (error) {
       setToast(error.message || 'Impossible d’enregistrer la note.');
     }
+  };
+
+  const startEditing = note => {
+    setSelectedNote(null);
+    setEditingNote(note);
+    setForm({ title: note.title, subject: note.subject || '', content: note.content });
+    setShowModal(true);
   };
 
   const downloadNote = note => {
@@ -75,7 +86,7 @@ export function Notes() {
           </h1>
           <p style={{ color: 'var(--text-secondary)' }}>{notes.length} note{notes.length !== 1 ? 's' : ''} organisée{notes.length !== 1 ? 's' : ''} par matière.</p>
         </div>
-        <Button variant="primary" onClick={() => setShowModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Button variant="primary" onClick={() => { setEditingNote(null); setForm({ title: '', subject: '', content: '' }); setShowModal(true); }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Plus size={18} /> Nouvelle Note
         </Button>
       </header>
@@ -87,7 +98,7 @@ export function Notes() {
           <p style={{ color: 'var(--text-secondary)', maxWidth: '400px' }}>
             Créez votre première note pour organiser vos cours par matière et réviser efficacement.
           </p>
-          <Button variant="primary" onClick={() => setShowModal(true)} style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Button variant="primary" onClick={() => { setEditingNote(null); setForm({ title: '', subject: '', content: '' }); setShowModal(true); }} style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Plus size={18} /> Créer une note
           </Button>
         </div>
@@ -123,16 +134,16 @@ export function Notes() {
         <div style={{
           position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem'
-        }} onClick={(e) => e.target === e.currentTarget && setShowModal(false)}>
+        }} onClick={(e) => e.target === e.currentTarget && (setEditingNote(null), setShowModal(false))}>
           <Card style={{ width: '100%', maxWidth: '500px', padding: '2rem', position: 'relative' }}>
             <button
-              onClick={() => setShowModal(false)}
+              onClick={() => { setEditingNote(null); setShowModal(false); }}
               style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
             >
               <X size={20} />
             </button>
 
-            <h2 className="text-xl font-bold" style={{ marginBottom: '1.5rem' }}>Nouvelle note</h2>
+            <h2 className="text-xl font-bold" style={{ marginBottom: '1.5rem' }}>{editingNote ? 'Modifier la note' : 'Nouvelle note'}</h2>
 
             <form onSubmit={handleAdd} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
@@ -162,8 +173,8 @@ export function Notes() {
                 />
               </div>
               <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
-                <Button variant="primary" type="submit" style={{ flex: 1 }}>Enregistrer</Button>
-                <Button variant="secondary" type="button" onClick={() => setShowModal(false)}>Annuler</Button>
+                <Button variant="primary" type="submit" style={{ flex: 1 }}>{editingNote ? 'Enregistrer les modifications' : 'Enregistrer'}</Button>
+                <Button variant="secondary" type="button" onClick={() => { setEditingNote(null); setShowModal(false); }}>Annuler</Button>
               </div>
             </form>
           </Card>
@@ -188,6 +199,9 @@ export function Notes() {
             <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>{selectedNote.content}</p>
             <div style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{selectedNote.date}</div>
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1.25rem' }}>
+              <Button variant="secondary" onClick={() => startEditing(selectedNote)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                Modifier
+              </Button>
               <Button variant="secondary" onClick={() => downloadNote(selectedNote)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Download size={16} /> Exporter en Markdown
               </Button>
