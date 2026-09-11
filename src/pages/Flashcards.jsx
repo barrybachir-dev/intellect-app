@@ -6,10 +6,11 @@ import { Button } from '../components/Button';
 import { useAppContext } from '../context/useAppContext';
 
 export function Flashcards() {
-  const { resumes } = useAppContext();
+  const { user, resumes } = useAppContext();
   const [selectedResumeId, setSelectedResumeId] = useState(resumes[0]?.id || '');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [cardStates, setCardStates] = useState(() => JSON.parse(localStorage.getItem(`intellect-flashcards-${user.email || 'guest'}`) || '{}'));
 
   const activeResumeId = selectedResumeId || resumes[0]?.id || '';
   const selectedResume = resumes.find(resume => String(resume.id) === String(activeResumeId));
@@ -18,6 +19,13 @@ export function Flashcards() {
   const changeCard = (nextIndex) => {
     setCurrentIndex(nextIndex);
     setIsFlipped(false);
+  };
+
+  const markCard = status => {
+    const key = `${activeResumeId}-${currentIndex}`;
+    const nextStates = { ...cardStates, [key]: status };
+    setCardStates(nextStates);
+    localStorage.setItem(`intellect-flashcards-${user.email || 'guest'}`, JSON.stringify(nextStates));
   };
 
   if (resumes.length === 0) {
@@ -71,6 +79,13 @@ export function Flashcards() {
               Suivante <ArrowRight size={16} />
             </Button>
           </div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+            <Button variant="secondary" onClick={() => markCard('review')} style={{ borderColor: 'rgba(248, 113, 113, 0.4)', color: '#f87171' }}>À revoir</Button>
+            <Button variant="secondary" onClick={() => markCard('known')} style={{ borderColor: 'rgba(74, 222, 128, 0.4)', color: '#4ade80' }}>Je savais</Button>
+          </div>
+          {cardStates[`${activeResumeId}-${currentIndex}`] && <p style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.75rem' }}>
+            {cardStates[`${activeResumeId}-${currentIndex}`] === 'known' ? 'Carte marquée comme connue.' : 'Carte ajoutée à revoir.'}
+          </p>}
         </>
       )}
     </div>
