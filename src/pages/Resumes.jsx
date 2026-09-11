@@ -9,7 +9,13 @@ export function Resumes() {
   const { resumes } = useAppContext();
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search')?.trim().toLowerCase() || '';
-  const visibleResumes = resumes.filter(resume => !searchQuery || [resume.title, resume.subject, resume.content].some(value => String(value || '').toLowerCase().includes(searchQuery)));
+  const [subjectFilter, setSubjectFilter] = React.useState('all');
+  const subjects = [...new Set(resumes.map(resume => resume.subject).filter(Boolean))].sort();
+  const visibleResumes = resumes.filter(resume => {
+    const matchesSearch = !searchQuery || [resume.title, resume.subject, resume.content].some(value => String(value || '').toLowerCase().includes(searchQuery));
+    const matchesSubject = subjectFilter === 'all' || resume.subject === subjectFilter;
+    return matchesSearch && matchesSubject;
+  });
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -25,12 +31,20 @@ export function Resumes() {
         </Link>
       </header>
 
+      {resumes.length > 0 && <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <label htmlFor="subject-filter" style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Matière :</label>
+        <select id="subject-filter" value={subjectFilter} onChange={event => setSubjectFilter(event.target.value)} style={{ padding: '0.65rem 0.9rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>
+          <option value="all">Toutes les matières</option>
+          {subjects.map(subject => <option key={subject} value={subject}>{subject}</option>)}
+        </select>
+      </div>}
+
       {visibleResumes.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', backgroundColor: 'var(--bg-card)', borderRadius: 'var(--radius-lg)' }}>
           <FileText size={48} color="var(--border-color)" />
-          <h2 className="text-2xl font-bold">{searchQuery ? 'Aucun résultat' : 'Aucun résumé'}</h2>
-          <p style={{ color: 'var(--text-secondary)', maxWidth: '400px' }}>{searchQuery ? 'Essaie un autre titre ou une autre matière.' : 'Uploadez votre premier cours au format PDF pour générer un résumé détaillé.'}</p>
-          {!searchQuery && <Link to="/dashboard/upload" style={{ marginTop: '1rem' }}><Button variant="primary">Commencer</Button></Link>}
+          <h2 className="text-2xl font-bold">{searchQuery || subjectFilter !== 'all' ? 'Aucun résultat' : 'Aucun résumé'}</h2>
+          <p style={{ color: 'var(--text-secondary)', maxWidth: '400px' }}>{searchQuery || subjectFilter !== 'all' ? 'Essaie une autre recherche ou une autre matière.' : 'Uploadez votre premier cours au format PDF pour générer un résumé détaillé.'}</p>
+          {!searchQuery && subjectFilter === 'all' && <Link to="/dashboard/upload" style={{ marginTop: '1rem' }}><Button variant="primary">Commencer</Button></Link>}
         </div>
       ) : (
         <div className="grid-responsive-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
