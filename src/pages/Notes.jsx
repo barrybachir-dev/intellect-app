@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FolderOpen, Plus, X, BookOpen, Download } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import { Toast } from '../components/Toast';
 import { useAppContext } from '../context/useAppContext';
 
 export function Notes() {
@@ -9,17 +10,23 @@ export function Notes() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ title: '', subject: '', content: '' });
   const [selectedNote, setSelectedNote] = useState(null);
+  const [toast, setToast] = useState('');
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!form.title || !form.content) return;
-    addNote({
-      title: form.title,
-      subject: form.subject.toUpperCase() || 'GEN',
-      content: form.content,
-    });
-    setForm({ title: '', subject: '', content: '' });
-    setShowModal(false);
+    try {
+      await addNote({
+        title: form.title,
+        subject: form.subject.toUpperCase() || 'GEN',
+        content: form.content,
+      });
+      setForm({ title: '', subject: '', content: '' });
+      setShowModal(false);
+      setToast('Note enregistrée.');
+    } catch (error) {
+      setToast(error.message || 'Impossible d’enregistrer la note.');
+    }
   };
 
   const downloadNote = note => {
@@ -31,6 +38,7 @@ export function Notes() {
     link.download = `${note.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'note'}.md`;
     link.click();
     URL.revokeObjectURL(url);
+    setToast('Note exportée en Markdown.');
   };
 
   const notesBySubject = notes.reduce((acc, note) => {
@@ -48,6 +56,7 @@ export function Notes() {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <Toast message={toast} onClose={() => setToast('')} />
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 className="text-4xl font-bold" style={{ margin: '0 0 0.5rem 0' }}>
