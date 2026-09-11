@@ -1,12 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, CheckCircle2, FileText, TrendingUp } from 'lucide-react';
+import { BookOpen, CheckCircle2, FileText, TrendingUp, Clock } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { useAppContext } from '../context/useAppContext';
 
 export function Progress() {
-  const { resumes, quizzes, notes } = useAppContext();
+  const { user, resumes, quizzes, notes } = useAppContext();
+  const storageKey = `intellect-study-seconds-${user.email || 'guest'}`;
+  const [studySeconds, setStudySeconds] = useState(() => Number(localStorage.getItem(storageKey) || 0));
+  const [isTracking, setIsTracking] = useState(false);
+
+  useEffect(() => {
+    if (!isTracking) return undefined;
+    const timer = window.setInterval(() => setStudySeconds(seconds => seconds + 1), 1000);
+    return () => window.clearInterval(timer);
+  }, [isTracking]);
+
+  useEffect(() => {
+    localStorage.setItem(storageKey, String(studySeconds));
+  }, [storageKey, studySeconds]);
+
+  const formattedStudyTime = `${String(Math.floor(studySeconds / 3600)).padStart(2, '0')}:${String(Math.floor((studySeconds % 3600) / 60)).padStart(2, '0')}:${String(studySeconds % 60).padStart(2, '0')}`;
   const completedQuizzes = quizzes.filter(quiz => quiz.completed && Number.isFinite(quiz.score));
   const averageScore = completedQuizzes.length
     ? Math.round(completedQuizzes.reduce((total, quiz) => total + quiz.score, 0) / completedQuizzes.length)
@@ -48,6 +63,14 @@ export function Progress() {
           </Card>
         ))}
       </div>
+
+      <Card style={{ padding: '1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div className="btn-icon"><Clock size={20} color="var(--accent-cyan)" /></div>
+          <div><h2 className="text-xl font-bold">Temps d’étude suivi</h2><p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Suivi sur cet appareil · {formattedStudyTime}</p></div>
+        </div>
+        <Button variant={isTracking ? 'secondary' : 'primary'} onClick={() => setIsTracking(tracking => !tracking)}>{isTracking ? 'Mettre en pause' : 'Démarrer le suivi'}</Button>
+      </Card>
 
       <Card style={{ padding: '1.5rem' }}>
         <h2 className="text-xl font-bold" style={{ marginBottom: '1.5rem' }}>Résultats par matière</h2>
