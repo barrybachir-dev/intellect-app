@@ -14,6 +14,7 @@ import { Flashcards } from './Flashcards';
 import { TopicStudy } from './TopicStudy';
 import { Progress } from './Progress';
 import { MockExam } from './MockExam';
+import { Calendar } from './Calendar';
 import { Search, Bell, Menu } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
@@ -135,6 +136,7 @@ export function Dashboard() {
           <Route path="/topic" element={<TopicStudy />} />
           <Route path="/progress" element={<Progress />} />
           <Route path="/mock-exam" element={<MockExam />} />
+          <Route path="/calendar" element={<Calendar />} />
           <Route path="/quiz" element={<QuizList />} />
           <Route path="/quiz/:id" element={<QuizExecution />} />
           <Route path="/notes" element={<Notes />} />

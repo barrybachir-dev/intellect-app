@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, UploadCloud, FileText, Brain, FolderOpen, Settings, Sparkles, X, BookOpen, Layers, PenLine, TrendingUp, Timer } from 'lucide-react';
+import { LayoutDashboard, UploadCloud, FileText, Brain, FolderOpen, Settings, Sparkles, X, BookOpen, Layers, PenLine, TrendingUp, Timer, CalendarDays } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 export function Sidebar({ isOpen, onClose }) {
@@ -11,6 +11,7 @@ export function Sidebar({ isOpen, onClose }) {
     { icon: <PenLine size={20} />, label: 'Étudier un sujet', path: '/dashboard/topic' },
     { icon: <TrendingUp size={20} />, label: 'Ma progression', path: '/dashboard/progress' },
     { icon: <Timer size={20} />, label: 'Examen blanc', path: '/dashboard/mock-exam' },
+    { icon: <CalendarDays size={20} />, label: 'Calendrier', path: '/dashboard/calendar' },
     { icon: <FileText size={20} />, label: 'Bibliothèque', path: '/dashboard/resumes' },
     { icon: <BookOpen size={20} />, label: 'Réviser par matière', path: '/dashboard/review' },
     { icon: <Layers size={20} />, label: 'Flashcards', path: '/dashboard/flashcards' },

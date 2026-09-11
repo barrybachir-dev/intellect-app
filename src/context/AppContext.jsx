@@ -24,6 +24,7 @@ export function AppProvider({ children }) {
       productUpdates: false,
       resumeReady: true,
     },
+    exams: [],
     authProvider: null, // 'email' | 'google' | 'github'
   });
 
@@ -71,6 +72,7 @@ export function AppProvider({ children }) {
               productUpdates: metadata.notifications?.productUpdates ?? false,
               resumeReady: metadata.notifications?.resumeReady ?? true,
             },
+            exams: Array.isArray(metadata.exams) ? metadata.exams : [],
             authProvider: session.user.app_metadata?.provider || 'email',
           });
           setResumes((resumeRows || []).map(row => ({ ...row, pages: row.page_count, time: new Date(row.created_at).toLocaleDateString('fr-FR'), keypoints: row.keypoints || [] })));
@@ -200,6 +202,12 @@ export function AppProvider({ children }) {
     const { error } = await supabase.auth.updateUser({ data: { notifications } });
     if (error) throw error;
     setUser(prev => ({ ...prev, notifications }));
+  };
+
+  const updateExams = async (exams) => {
+    const { error } = await supabase.auth.updateUser({ data: { exams } });
+    if (error) throw error;
+    setUser(prev => ({ ...prev, exams }));
   };
 
   const resetPassword = async (email) => {
@@ -365,7 +373,7 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
-      isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword, resetPassword, updateAvatar, updateNotifications,
+      isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword, resetPassword, updateAvatar, updateNotifications, updateExams,
       user, setUser,
       usage, canUpload, processDocument, generateForResume, generateTopic, submitQuiz,
       resumes, quizzes, notes, addNote, recentActivity,
