@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, Download, Sparkles } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { useAppContext } from '../context/AppContext';
@@ -25,6 +25,30 @@ export function ResumeDetail() {
     } finally {
       setGeneratingMode('');
     }
+  };
+
+  const downloadRevisionSheet = () => {
+    const markdown = [
+      `# ${resume.title}`,
+      '',
+      `**Matière :** ${resume.subject || 'Sans matière'}`,
+      `**Pages :** ${resume.pages || 'Non renseigné'}`,
+      '',
+      '## Résumé',
+      '',
+      resume.content || 'Aucun résumé disponible.',
+      '',
+      '## Points clés',
+      '',
+      ...(resume.keypoints || []).map(point => `- ${point}`),
+    ].join('\n');
+    const file = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${resume.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'fiche-revision'}.md`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   if (!resume) {
@@ -62,6 +86,9 @@ export function ResumeDetail() {
               {generatingMode === 'quiz' ? 'Préparation...' : 'Créer le quiz'}
             </Button>
           )}
+          <Button variant="secondary" style={{ padding: '0.5rem 1rem' }} onClick={downloadRevisionSheet}>
+            <Download size={16} /> Fiche Markdown
+          </Button>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
