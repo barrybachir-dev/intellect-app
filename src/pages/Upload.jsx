@@ -15,6 +15,7 @@ export function Upload() {
   const [error, setError] = useState('');
   const [processingStage, setProcessingStage] = useState('');
   const [generationMode, setGenerationMode] = useState('all');
+  const [academicInfo, setAcademicInfo] = useState({ course: '', semester: '' });
 
   const handleProcessFile = (file) => {
     if (!canUpload()) {
@@ -25,7 +26,7 @@ export function Upload() {
     setError('');
     setProcessingStage('Téléchargement du PDF…');
     setIsUploading(true);
-    processDocument(file, generationMode)
+    processDocument(file, generationMode, academicInfo)
       .then(resumeId => navigate('/dashboard/resumes/' + resumeId))
       .catch(uploadError => {
         setError(uploadError.message || 'Le traitement du document a echoue.');
@@ -95,6 +96,11 @@ export function Upload() {
           ))}
         </div>
       </fieldset>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
+        <input value={academicInfo.course} onChange={event => setAcademicInfo(previous => ({ ...previous, course: event.target.value }))} placeholder="Cours (facultatif)" disabled={isUploading} style={{ padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', outline: 'none' }} />
+        <input value={academicInfo.semester} onChange={event => setAcademicInfo(previous => ({ ...previous, semester: event.target.value }))} placeholder="Semestre (facultatif)" disabled={isUploading} style={{ padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', outline: 'none' }} />
+      </div>
 
       {error && <div style={{ padding: '0.75rem 1rem', marginBottom: '1rem', color: '#f87171', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-sm)' }}>{error}</div>}
 

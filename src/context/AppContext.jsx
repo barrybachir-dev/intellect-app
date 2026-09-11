@@ -227,7 +227,7 @@ export function AppProvider({ children }) {
   // ────────── Upload / Limits ──────────
   const canUpload = () => usage.resumesCount < usage.resumesLimit || user.plan === 'Pro';
 
-  const processDocument = async (fileData, generationMode = 'all') => {
+  const processDocument = async (fileData, generationMode = 'all', metadata = {}) => {
     const { data: { user: authenticatedUser } } = await supabase.auth.getUser();
     if (!authenticatedUser) throw new Error('Votre session a expire.');
 
@@ -257,7 +257,7 @@ export function AppProvider({ children }) {
     }
 
     const { data: functionData, error: functionError } = await supabase.functions.invoke('process-document', {
-      body: JSON.stringify({ resumeId: String(resumeId), mode: generationMode }),
+      body: JSON.stringify({ resumeId: String(resumeId), mode: generationMode, ...metadata }),
       headers: { 'Content-Type': 'application/json' },
     });
     if (functionError) {
@@ -306,7 +306,7 @@ export function AppProvider({ children }) {
     if (data?.generatedNote) setNotes(prev => [data.generatedNote, ...prev]);
   };
 
-  const generateTopic = async (topic, mode = 'all', subject = '') => {
+  const generateTopic = async (topic, mode = 'all', subject = '', metadata = {}) => {
     const { data: { user: authenticatedUser } } = await supabase.auth.getUser();
     if (!authenticatedUser) throw new Error('Votre session a expire.');
     if (!topic.trim()) throw new Error('Saisissez un sujet à étudier.');
@@ -321,7 +321,7 @@ export function AppProvider({ children }) {
     if (insertError) throw insertError;
 
     const { data, error } = await supabase.functions.invoke('process-document', {
-      body: JSON.stringify({ resumeId, mode, topic: topic.trim(), subject: subject.trim() }),
+      body: JSON.stringify({ resumeId, mode, topic: topic.trim(), subject: subject.trim(), ...metadata }),
       headers: { 'Content-Type': 'application/json' },
     });
     if (error || data?.error) {
@@ -382,6 +382,17 @@ export function AppProvider({ children }) {
     setNotes(prev => prev.map(note => note.id === noteId ? updatedNote : note));
   };
 
+  const updateResume = async (resumeId, resumeData) => {
+    const { data, error } = await supabase.from('resumes').update({
+      title: resumeData.title,
+      subject: resumeData.subject,
+      course: resumeData.course,
+      semester: resumeData.semester,
+    }).eq('id', resumeId).select().single();
+    if (error) throw error;
+    setResumes(prev => prev.map(resume => resume.id === resumeId ? { ...resume, ...data, pages: data.page_count, time: new Date(data.created_at).toLocaleDateString('fr-FR'), keypoints: data.keypoints || [] } : resume));
+  };
+
   // ────────── Stats ──────────
   const getAverageScore = () => {
     const completed = quizzes.filter(q => q.completed);
@@ -401,7 +412,7 @@ export function AppProvider({ children }) {
       isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword, resetPassword, updateAvatar, updateNotifications, updateExams, theme, toggleTheme,
       user, setUser,
       usage, canUpload, processDocument, generateForResume, generateTopic, submitQuiz,
-      resumes, quizzes, notes, addNote, updateNote, deleteNote, recentActivity,
+      resumes, quizzes, notes, addNote, updateNote, deleteNote, updateResume, recentActivity,
       stats,
     }}>
       {children}

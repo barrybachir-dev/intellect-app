@@ -30,8 +30,9 @@ export function Progress() {
   const subjects = resumes.reduce((groups, resume) => {
     const subject = resume.subject || 'Sans matière';
     const resumeQuiz = quizzes.find(quiz => String(quiz.resumeId) === String(resume.id) && quiz.completed && Number.isFinite(quiz.score));
-    if (!groups[subject]) groups[subject] = { documents: 0, scores: [] };
+    if (!groups[subject]) groups[subject] = { documents: 0, scores: [], academicLabels: [] };
     groups[subject].documents += 1;
+    groups[subject].academicLabels.push(...[resume.course, resume.semester].filter(Boolean));
     if (resumeQuiz) groups[subject].scores.push(resumeQuiz.score);
     return groups;
   }, {});
@@ -39,6 +40,7 @@ export function Progress() {
   const subjectRows = Object.entries(subjects).map(([name, data]) => ({
     name,
     documents: data.documents,
+    academicLabels: [...new Set(data.academicLabels)],
     score: data.scores.length ? Math.round(data.scores.reduce((total, score) => total + score, 0) / data.scores.length) : null,
   })).sort((first, second) => (first.score ?? -1) - (second.score ?? -1));
 
@@ -84,7 +86,7 @@ export function Progress() {
             {subjectRows.map(subject => (
               <div key={subject.name}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', marginBottom: '0.5rem' }}>
-                  <span style={{ fontWeight: '600' }}>{subject.name}</span>
+                  <span style={{ fontWeight: '600' }}>{subject.name}{subject.academicLabels.length > 0 && <small style={{ display: 'block', color: 'var(--text-secondary)', fontWeight: 'normal', marginTop: '0.2rem' }}>{subject.academicLabels.join(' · ')}</small>}</span>
                   <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{subject.score === null ? 'Aucun quiz terminé' : `${subject.score}%`} · {subject.documents} document{subject.documents > 1 ? 's' : ''}</span>
                 </div>
                 <div style={{ height: '8px', backgroundColor: 'var(--bg-input)', borderRadius: '999px', overflow: 'hidden' }}>

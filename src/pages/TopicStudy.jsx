@@ -17,6 +17,8 @@ export function TopicStudy() {
   const navigate = useNavigate();
   const [topic, setTopic] = useState('');
   const [subject, setSubject] = useState('');
+  const [course, setCourse] = useState('');
+  const [semester, setSemester] = useState('');
   const [mode, setMode] = useState('all');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -26,7 +28,7 @@ export function TopicStudy() {
     setError('');
     setLoading(true);
     try {
-      const resumeId = await generateTopic(topic, mode, subject);
+      const resumeId = await generateTopic(topic, mode, subject, { course, semester });
       navigate(`/dashboard/resumes/${resumeId}`);
     } catch (generationError) {
       setError(generationError.message || 'Impossible de préparer ce sujet.');
@@ -47,6 +49,10 @@ export function TopicStudy() {
           <label htmlFor="study-topic" style={{ fontWeight: 'bold' }}>Quel sujet veux-tu travailler ?</label>
           <textarea id="study-topic" value={topic} onChange={event => setTopic(event.target.value)} placeholder="Ex : Les lois de Newton, la photosynthèse, le droit constitutionnel..." rows={4} disabled={loading} style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', padding: '1rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', outline: 'none', fontSize: '1rem' }} />
           <input value={subject} onChange={event => setSubject(event.target.value)} placeholder="Matière (facultatif) — ex : Physique" disabled={loading} style={{ width: '100%', boxSizing: 'border-box', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', outline: 'none', fontSize: '0.95rem' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+            <input value={course} onChange={event => setCourse(event.target.value)} placeholder="Cours (facultatif)" disabled={loading} style={{ width: '100%', boxSizing: 'border-box', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', outline: 'none' }} />
+            <input value={semester} onChange={event => setSemester(event.target.value)} placeholder="Semestre (facultatif)" disabled={loading} style={{ width: '100%', boxSizing: 'border-box', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', outline: 'none' }} />
+          </div>
 
           <fieldset style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem' }}>
             <legend style={{ padding: '0 0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Format souhaité</legend>

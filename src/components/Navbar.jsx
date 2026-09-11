@@ -5,7 +5,7 @@ import { Sparkles } from 'lucide-react';
 
 export function Navbar() {
   return (
-    <nav style={{
+    <nav className="public-navbar" style={{
       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       padding: '1.5rem 2rem', borderBottom: '1px solid var(--border-color)',
       backgroundColor: 'var(--bg-color)'
@@ -17,13 +17,12 @@ export function Navbar() {
         Intellect
       </div>
       
-      <div style={{ display: 'flex', gap: '2rem', color: 'var(--text-secondary)' }}>
+      <div className="public-nav-links" style={{ display: 'flex', gap: '2rem', color: 'var(--text-secondary)' }}>
         <a href="#features" className="hover:text-white">Fonctionnalités</a>
-        <a href="#tarifs" className="hover:text-white">Tarifs</a>
-        <a href="#faq" className="hover:text-white">FAQ</a>
+        <a href="#features" className="hover:text-white">La méthode</a>
       </div>
       
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+      <div className="public-nav-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <Link to="/login" style={{ fontWeight: '500', color: 'var(--text-primary)' }}>Connexion</Link>
         <Link to="/dashboard">
           <Button variant="primary" style={{ padding: '0.5rem 1rem', borderRadius: '9999px' }}>Commencer</Button>

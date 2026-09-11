@@ -88,6 +88,11 @@ export function MockExam() {
             <button key={optionIndex} type="button" onClick={() => setAnswers(previous => ({ ...previous, [currentIndex]: optionIndex }))} style={{ padding: '1rem', textAlign: 'left', borderRadius: 'var(--radius-md)', border: `1px solid ${answers[currentIndex] === optionIndex ? 'var(--accent-cyan)' : 'var(--border-color)'}`, backgroundColor: answers[currentIndex] === optionIndex ? 'rgba(0, 229, 255, 0.1)' : 'var(--bg-input)', color: 'var(--text-primary)', cursor: 'pointer' }}>{option}</button>
           ))}
         </div>
+        {answers[currentIndex] !== undefined && currentQuestion.explanation && (
+          <div style={{ padding: '1rem', marginTop: '1rem', borderRadius: 'var(--radius-md)', backgroundColor: 'rgba(0, 229, 255, 0.08)', border: '1px solid rgba(0, 229, 255, 0.25)', color: 'var(--text-secondary)' }}>
+            <strong style={{ color: 'var(--accent-cyan)' }}>À retenir : </strong>{currentQuestion.explanation}
+          </div>
+        )}
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem', gap: '1rem' }}>
           <Button variant="secondary" onClick={() => setCurrentIndex(index => Math.max(0, index - 1))} disabled={currentIndex === 0}>Précédente</Button>
           <Button variant="primary" onClick={() => currentIndex === questions.length - 1 ? setIsFinished(true) : setCurrentIndex(index => index + 1)}>{currentIndex === questions.length - 1 ? 'Terminer' : 'Suivante'}</Button>

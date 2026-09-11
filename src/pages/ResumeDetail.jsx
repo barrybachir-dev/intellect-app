@@ -8,9 +8,11 @@ import { useAppContext } from '../context/useAppContext';
 export function ResumeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { resumes, quizzes, generateForResume } = useAppContext();
+  const { resumes, quizzes, generateForResume, updateResume } = useAppContext();
   const [generatingMode, setGeneratingMode] = useState('');
   const [generationError, setGenerationError] = useState('');
+  const [editingMetadata, setEditingMetadata] = useState(false);
+  const [metadataForm, setMetadataForm] = useState({ title: '', subject: '', course: '', semester: '' });
   
   const resume = resumes.find(r => String(r.id) === id);
   const relatedQuiz = quizzes.find(q => String(q.resumeId) === id);
@@ -27,11 +29,28 @@ export function ResumeDetail() {
     }
   };
 
+  const startMetadataEdit = () => {
+    setMetadataForm({ title: resume.title, subject: resume.subject || '', course: resume.course || '', semester: resume.semester || '' });
+    setEditingMetadata(true);
+  };
+
+  const saveMetadata = async event => {
+    event.preventDefault();
+    try {
+      await updateResume(id, metadataForm);
+      setEditingMetadata(false);
+    } catch (error) {
+      setGenerationError(error.message || 'Impossible de modifier le classement.');
+    }
+  };
+
   const downloadRevisionSheet = () => {
     const markdown = [
       `# ${resume.title}`,
       '',
       `**Matière :** ${resume.subject || 'Sans matière'}`,
+      `**Cours :** ${resume.course || 'Non renseigné'}`,
+      `**Semestre :** ${resume.semester || 'Non renseigné'}`,
       `**Pages :** ${resume.pages || 'Non renseigné'}`,
       '',
       '## Résumé',
@@ -70,8 +89,14 @@ export function ResumeDetail() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <span className="badge" style={{ marginBottom: '1rem' }}>{resume.subject}</span>
-            <h1 className="text-3xl font-bold" style={{ margin: '0.5rem 0' }}>{resume.title}</h1>
+            {editingMetadata ? (
+              <form onSubmit={saveMetadata} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', margin: '0.5rem 0' }}>
+                {['title', 'subject', 'course', 'semester'].map(field => <input key={field} required={field === 'title'} value={metadataForm[field]} onChange={event => setMetadataForm(previous => ({ ...previous, [field]: event.target.value }))} placeholder={field === 'title' ? 'Titre' : field === 'subject' ? 'Matière' : field === 'course' ? 'Cours' : 'Semestre'} style={{ padding: '0.6rem 0.75rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }} />)}
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}><Button variant="primary" type="submit">Enregistrer</Button><Button variant="secondary" type="button" onClick={() => setEditingMetadata(false)}>Annuler</Button></div>
+              </form>
+            ) : <h1 className="text-3xl font-bold" style={{ margin: '0.5rem 0' }}>{resume.title}</h1>}
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{resume.pages} pages · {resume.time}</p>
+            {(resume.course || resume.semester) && <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.35rem' }}>{[resume.course, resume.semester].filter(Boolean).join(' · ')}</p>}
           </div>
           
           {relatedQuiz && (
@@ -90,6 +115,8 @@ export function ResumeDetail() {
             <Download size={16} /> Fiche Markdown
           </Button>
         </div>
+
+        {!editingMetadata && <Button variant="secondary" onClick={startMetadataEdit} style={{ marginBottom: '1.5rem' }}>Modifier le classement</Button>}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
           <Button variant="secondary" onClick={() => handleGenerate('notes')} disabled={Boolean(generatingMode)}>

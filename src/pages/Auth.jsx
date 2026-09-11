@@ -124,22 +124,8 @@ export function Auth() {
 
         <div>
           <h2 className="text-3xl font-bold" style={{ lineHeight: 1.4, marginBottom: '2rem' }}>
-            « Intellect a divisé mon temps de révision par deux. Quiz instantanés, résumés parfaits. »
+            Un espace simple pour comprendre tes cours, t’entraîner et suivre tes révisions.
           </h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{
-              width: '3rem', height: '3rem', borderRadius: '50%',
-              background: 'var(--gradient-primary)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: 'bold', color: '#0d0e1a'
-            }}>
-              LM
-            </div>
-            <div>
-              <div style={{ fontWeight: 'bold' }}>Léa M.</div>
-              <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>PASS — Université de Lyon</div>
-            </div>
-          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '3rem' }}>

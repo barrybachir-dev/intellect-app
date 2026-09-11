@@ -32,6 +32,7 @@ export function ReviewBySubject() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
           {Object.entries(subjects).map(([subject, subjectResumes]) => {
             const subjectQuizCount = subjectResumes.filter(resume => quizzes.some(quiz => String(quiz.resumeId) === String(resume.id))).length;
+            const academicLabels = [...new Set(subjectResumes.flatMap(resume => [resume.course, resume.semester].filter(Boolean)))];
             return (
               <Card key={subject} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -39,15 +40,16 @@ export function ReviewBySubject() {
                   <div>
                     <h2 className="text-xl font-bold">{subject}</h2>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{subjectResumes.length} document{subjectResumes.length > 1 ? 's' : ''}</p>
+                                      {academicLabels.length > 0 && <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '0.25rem' }}>{academicLabels.join(' · ')}</p>}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
                   <span><FileText size={15} /> {subjectResumes.length} résumés</span>
                   <span><Brain size={15} /> {subjectQuizCount} quiz</span>
                 </div>
-                <Link to={`/dashboard/resumes/${subjectResumes[0].id}`} style={{ marginTop: 'auto' }}>
-                  <Button variant="secondary" style={{ width: '100%' }}>Commencer la révision</Button>
-                </Link>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: 'auto' }}>
+                  {subjectResumes.map(resume => <Link key={resume.id} to={`/dashboard/resumes/${resume.id}`} style={{ display: 'block', padding: '0.7rem 0.8rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: '0.875rem' }}>{resume.title}</Link>)}
+                </div>
               </Card>
             );
           })}

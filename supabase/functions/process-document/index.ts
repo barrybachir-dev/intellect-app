@@ -36,6 +36,8 @@ Deno.serve(async request => {
     const mode = ['summary', 'quiz', 'notes', 'all'].includes(requestBody?.mode) ? requestBody.mode : 'all'
     const topic = typeof requestBody?.topic === 'string' ? requestBody.topic.trim() : ''
     const requestedSubject = typeof requestBody?.subject === 'string' ? requestBody.subject.trim() : ''
+    const course = typeof requestBody?.course === 'string' ? requestBody.course.trim() : ''
+    const semester = typeof requestBody?.semester === 'string' ? requestBody.semester.trim() : ''
     resumeId = requestBody?.resumeId || requestBody?.id
     if (!resumeId) throw new Error('Identifiant de document manquant.')
     const { data: resume, error: resumeError } = await supabase
@@ -112,6 +114,8 @@ Deno.serve(async request => {
     const result = JSON.parse(responseText)
     const { error: updateError } = await supabase.from('resumes').update({
       subject: requestedSubject || result.subject,
+      course,
+      semester,
       page_count: result.page_count,
       content: result.content,
       keypoints: result.keypoints,
@@ -134,6 +138,8 @@ Deno.serve(async request => {
         user_id: user.id,
         title: `Fiche : ${resume.title}`,
         subject: requestedSubject || result.subject,
+        course,
+        semester,
         content: result.content,
       }).select().single()
       if (noteError) throw noteError

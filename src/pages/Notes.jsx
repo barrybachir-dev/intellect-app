@@ -8,7 +8,7 @@ import { useAppContext } from '../context/useAppContext';
 export function Notes() {
   const { notes, addNote, updateNote, deleteNote } = useAppContext();
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ title: '', subject: '', content: '' });
+  const [form, setForm] = useState({ title: '', subject: '', course: '', semester: '', content: '' });
   const [selectedNote, setSelectedNote] = useState(null);
   const [editingNote, setEditingNote] = useState(null);
   const [toast, setToast] = useState('');
@@ -20,11 +20,13 @@ export function Notes() {
       const noteData = {
         title: form.title,
         subject: form.subject.toUpperCase() || 'GEN',
+        course: form.course,
+        semester: form.semester,
         content: form.content,
       };
       if (editingNote) await updateNote(editingNote.id, noteData);
       else await addNote(noteData);
-      setForm({ title: '', subject: '', content: '' });
+      setForm({ title: '', subject: '', course: '', semester: '', content: '' });
       setEditingNote(null);
       setShowModal(false);
       setToast(editingNote ? 'Note modifiée.' : 'Note enregistrée.');
@@ -36,12 +38,12 @@ export function Notes() {
   const startEditing = note => {
     setSelectedNote(null);
     setEditingNote(note);
-    setForm({ title: note.title, subject: note.subject || '', content: note.content });
+    setForm({ title: note.title, subject: note.subject || '', course: note.course || '', semester: note.semester || '', content: note.content });
     setShowModal(true);
   };
 
   const downloadNote = note => {
-    const markdown = `# ${note.title}\n\n**Matière :** ${note.subject || 'Général'}\n\n${note.content}`;
+    const markdown = `# ${note.title}\n\n**Matière :** ${note.subject || 'Général'}\n**Cours :** ${note.course || 'Non renseigné'}\n**Semestre :** ${note.semester || 'Non renseigné'}\n\n${note.content}`;
     const file = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(file);
     const link = document.createElement('a');
@@ -86,7 +88,7 @@ export function Notes() {
           </h1>
           <p style={{ color: 'var(--text-secondary)' }}>{notes.length} note{notes.length !== 1 ? 's' : ''} organisée{notes.length !== 1 ? 's' : ''} par matière.</p>
         </div>
-        <Button variant="primary" onClick={() => { setEditingNote(null); setForm({ title: '', subject: '', content: '' }); setShowModal(true); }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Button variant="primary" onClick={() => { setEditingNote(null); setForm({ title: '', subject: '', course: '', semester: '', content: '' }); setShowModal(true); }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Plus size={18} /> Nouvelle Note
         </Button>
       </header>
@@ -98,7 +100,7 @@ export function Notes() {
           <p style={{ color: 'var(--text-secondary)', maxWidth: '400px' }}>
             Créez votre première note pour organiser vos cours par matière et réviser efficacement.
           </p>
-          <Button variant="primary" onClick={() => { setEditingNote(null); setForm({ title: '', subject: '', content: '' }); setShowModal(true); }} style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Button variant="primary" onClick={() => { setEditingNote(null); setForm({ title: '', subject: '', course: '', semester: '', content: '' }); setShowModal(true); }} style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Plus size={18} /> Créer une note
           </Button>
         </div>
@@ -162,6 +164,10 @@ export function Notes() {
                   style={inputStyle}
                 />
               </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <input type="text" placeholder="Cours" value={form.course} onChange={e => setForm(p => ({ ...p, course: e.target.value }))} style={inputStyle} />
+                <input type="text" placeholder="Semestre" value={form.semester} onChange={e => setForm(p => ({ ...p, semester: e.target.value }))} style={inputStyle} />
+              </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.4rem' }}>Contenu *</label>
                 <textarea
@@ -195,6 +201,7 @@ export function Notes() {
               <X size={20} />
             </button>
             <span className="badge" style={{ marginBottom: '1rem', display: 'inline-block' }}>{selectedNote.subject}</span>
+            {(selectedNote.course || selectedNote.semester) && <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '0.75rem' }}>{[selectedNote.course, selectedNote.semester].filter(Boolean).join(' · ')}</div>}
             <h2 className="text-2xl font-bold" style={{ marginBottom: '1rem' }}>{selectedNote.title}</h2>
             <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>{selectedNote.content}</p>
             <div style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{selectedNote.date}</div>

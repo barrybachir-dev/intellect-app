@@ -71,14 +71,14 @@ export function Landing() {
               <FolderOpen size={20} color="var(--accent-cyan)" />
             </div>
             <h3 className="text-xl font-bold" style={{ marginBottom: '0.75rem' }}>Notes organisées</h3>
-            <p className="text-secondary">Tags, dossiers, recherche sémantique. Retrouve l'information en un clic.</p>
+            <p className="text-secondary">Matières, cours et semestres pour retrouver tes contenus plus facilement.</p>
           </Card>
           
           <Card>
             <div className="btn-icon" style={{ marginBottom: '1.5rem' }}>
               <Zap size={20} color="var(--accent-cyan)" />
             </div>
-            <h3 className="text-xl font-bold" style={{ marginBottom: '0.75rem' }}>Vitesse extrême</h3>
+            <h3 className="text-xl font-bold" style={{ marginBottom: '0.75rem' }}>Révision organisée</h3>
             <p className="text-secondary">Un espace clair pour retrouver tes contenus et reprendre tes révisions.</p>
           </Card>
           
@@ -86,7 +86,7 @@ export function Landing() {
             <div className="btn-icon" style={{ marginBottom: '1.5rem' }}>
               <Shield size={20} color="var(--accent-cyan)" />
             </div>
-            <h3 className="text-xl font-bold" style={{ marginBottom: '0.75rem' }}>100% privé</h3>
+            <h3 className="text-xl font-bold" style={{ marginBottom: '0.75rem' }}>Espace privé</h3>
             <p className="text-secondary">Tes documents sont conservés dans un espace privé associé à ton compte.</p>
           </Card>
           
@@ -106,7 +106,7 @@ export function Landing() {
           <Sparkles size={16} color="var(--accent-cyan)" /> Intellect © 2026
         </div>
         <div style={{ display: 'flex', gap: '1.5rem' }}>
-          <a href="#tarifs">Tarifs</a>
+          <a href="#features">Fonctionnalités</a>
           <Link to="/login">Connexion</Link>
         </div>
       </footer>

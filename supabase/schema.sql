@@ -13,6 +13,8 @@ create table public.resumes (
   user_id uuid not null references auth.users(id) on delete cascade,
   title text not null,
   subject text not null default '',
+  course text not null default '',
+  semester text not null default '',
   source_path text not null,
   page_count integer,
   content text not null default '',
@@ -38,6 +40,8 @@ create table public.notes (
   user_id uuid not null references auth.users(id) on delete cascade,
   title text not null,
   subject text not null default 'GEN',
+  course text not null default '',
+  semester text not null default '',
   content text not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
