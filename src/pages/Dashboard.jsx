@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Link, Routes, Route, useNavigate } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
 import { DashboardOverview } from './DashboardOverview';
 import { Upload } from './Upload';
@@ -74,9 +74,9 @@ export function Dashboard() {
                 <div style={{ position: 'absolute', top: '2rem', right: 0, width: '240px', padding: '1rem', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', boxShadow: '0 12px 30px rgba(0,0,0,0.25)', zIndex: 20 }}>
                   <div style={{ fontWeight: 'bold', marginBottom: '0.35rem' }}>Notifications</div>
                   <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Aucune nouvelle notification.</p>
-                  <button type="button" onClick={() => { setNotificationsOpen(false); navigate('/dashboard/settings'); }} style={{ marginTop: '0.75rem', padding: 0, border: 0, background: 'none', color: 'var(--accent-cyan)', cursor: 'pointer', fontSize: '0.8rem' }}>
+                  <Link to="/dashboard/settings?tab=notifications" onClick={() => setNotificationsOpen(false)} style={{ display: 'inline-block', marginTop: '0.75rem', color: 'var(--accent-cyan)', fontSize: '0.8rem' }}>
                     Gérer les notifications
-                  </button>
+                  </Link>
                 </div>
               )}
             </div>
