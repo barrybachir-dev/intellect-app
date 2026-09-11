@@ -6,6 +6,7 @@ const AppContext = createContext();
 export function AppProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
+  const [theme, setTheme] = useState(() => localStorage.getItem('intellect-theme') || 'dark');
   const oauthProviders = {
     google: import.meta.env.VITE_ENABLE_GOOGLE_AUTH === 'true',
     github: import.meta.env.VITE_ENABLE_GITHUB_AUTH === 'true',
@@ -38,6 +39,13 @@ export function AppProvider({ children }) {
   const [quizzes, setQuizzes] = useState([]);
   const [notes, setNotes] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('intellect-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(currentTheme => currentTheme === 'dark' ? 'light' : 'dark');
 
   useEffect(() => {
     let mounted = true;
@@ -373,7 +381,7 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
-      isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword, resetPassword, updateAvatar, updateNotifications, updateExams,
+      isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword, resetPassword, updateAvatar, updateNotifications, updateExams, theme, toggleTheme,
       user, setUser,
       usage, canUpload, processDocument, generateForResume, generateTopic, submitQuiz,
       resumes, quizzes, notes, addNote, recentActivity,

@@ -33,6 +33,22 @@
   --radius-xl: 1.5rem;
 }
 
+:root[data-theme='light'] {
+  --bg-color: #f5f7fb;
+  --bg-card: #ffffff;
+  --bg-card-hover: #eef3f8;
+  --bg-input: #f1f5f9;
+  --bg-sidebar: #ffffff;
+  --text-primary: #172033;
+  --text-secondary: #526176;
+  --text-muted: #718096;
+  --accent-cyan: #087f9b;
+  --accent-purple: #7251b5;
+  --accent-blue: #2563eb;
+  --border-color: rgba(23, 32, 51, 0.12);
+  --border-color-hover: rgba(23, 32, 51, 0.24);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

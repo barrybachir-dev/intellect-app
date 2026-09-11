@@ -15,7 +15,7 @@ import { TopicStudy } from './TopicStudy';
 import { Progress } from './Progress';
 import { MockExam } from './MockExam';
 import { Calendar } from './Calendar';
-import { Search, Bell, Menu } from 'lucide-react';
+import { Search, Bell, Menu, Sun, Moon } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 export function Dashboard() {
@@ -23,7 +23,7 @@ export function Dashboard() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { user, logout } = useAppContext();
+  const { user, logout, theme, toggleTheme } = useAppContext();
   const navigate = useNavigate();
 
   const handleSearch = event => {
@@ -73,6 +73,9 @@ export function Dashboard() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <button type="button" aria-label={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'} onClick={toggleTheme} style={{ display: 'flex', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
             <div style={{ position: 'relative' }}>
               <button
                 type="button"
