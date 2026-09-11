@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { User, CreditCard, Bell, Shield, Check, Sparkles, Lock, Camera } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 const PLANS = [
   {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, UploadCloud, FileText, Brain, FolderOpen, Settings, Sparkles, X, BookOpen, Layers, PenLine, TrendingUp, Timer, CalendarDays } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 export function Sidebar({ isOpen, onClose }) {
   const { user } = useAppContext();

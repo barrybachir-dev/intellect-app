@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-
-const AppContext = createContext();
+import { AppContext } from './AppContextValue';
 
 export function AppProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -392,6 +391,3 @@ export function AppProvider({ children }) {
   );
 }
 
-export function useAppContext() {
-  return useContext(AppContext);
-}

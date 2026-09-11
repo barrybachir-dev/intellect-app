@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { CheckCircle2, Timer } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 const EXAM_DURATION_SECONDS = 15 * 60;
 

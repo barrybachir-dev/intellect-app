@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { FileText, Brain, FolderOpen, TrendingUp, Upload, ArrowRight, CalendarDays } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import { Link } from 'react-router-dom';
 
 export function DashboardOverview() {

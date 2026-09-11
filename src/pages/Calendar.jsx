@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CalendarDays, Check, Trash2 } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 export function Calendar() {
   const { user, updateExams } = useAppContext();

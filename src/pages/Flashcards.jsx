@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Layers, RotateCcw } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 export function Flashcards() {
   const { resumes } = useAppContext();

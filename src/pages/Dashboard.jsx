@@ -16,7 +16,7 @@ import { Progress } from './Progress';
 import { MockExam } from './MockExam';
 import { Calendar } from './Calendar';
 import { Search, Bell, Menu, Sun, Moon } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 export function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

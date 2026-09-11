@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { FileText, Sparkles } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 export function Resumes() {
   const { resumes } = useAppContext();
