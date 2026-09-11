@@ -36,7 +36,7 @@ export function Landing() {
         </div>
         
         <p className="text-sm text-muted" style={{ marginTop: '1.5rem' }}>
-          Aucune carte bancaire requise · 1 000+ étudiants nous font confiance
+          Aucune carte bancaire requise · Commence gratuitement
         </p>
       </main>
 
@@ -79,7 +79,7 @@ export function Landing() {
               <Zap size={20} color="var(--accent-cyan)" />
             </div>
             <h3 className="text-xl font-bold" style={{ marginBottom: '0.75rem' }}>Vitesse extrême</h3>
-            <p className="text-secondary">Optimisé pour des réponses sub-secondes. Aucun temps mort entre toi et ton savoir.</p>
+            <p className="text-secondary">Un espace clair pour retrouver tes contenus et reprendre tes révisions.</p>
           </Card>
           
           <Card>
@@ -87,7 +87,7 @@ export function Landing() {
               <Shield size={20} color="var(--accent-cyan)" />
             </div>
             <h3 className="text-xl font-bold" style={{ marginBottom: '0.75rem' }}>100% privé</h3>
-            <p className="text-secondary">Tes documents restent les tiens. Chiffrement de bout en bout, jamais partagés sans ton consentement.</p>
+            <p className="text-secondary">Tes documents sont conservés dans un espace privé associé à ton compte.</p>
           </Card>
           
           <Card>

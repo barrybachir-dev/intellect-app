@@ -148,16 +148,16 @@ export function Auth() {
 
         <div style={{ display: 'flex', gap: '3rem' }}>
           <div>
-            <div className="text-2xl font-bold text-gradient">12k+</div>
-            <div className="text-sm text-secondary">étudiants</div>
+            <div className="text-2xl font-bold text-gradient">PDF</div>
+            <div className="text-sm text-secondary">importés en privé</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-gradient">4.9★</div>
-            <div className="text-sm text-secondary">satisfaction</div>
+            <div className="text-2xl font-bold text-gradient">Quiz</div>
+            <div className="text-sm text-secondary">pour s'entraîner</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-gradient">2×</div>
-            <div className="text-sm text-secondary">plus rapide</div>
+            <div className="text-2xl font-bold text-gradient">Notes</div>
+            <div className="text-sm text-secondary">organisées</div>
           </div>
         </div>
       </div>
