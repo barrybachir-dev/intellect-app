@@ -34,6 +34,7 @@ Deno.serve(async request => {
 
     const requestBody = await request.json()
     const mode = ['summary', 'quiz', 'notes', 'all'].includes(requestBody?.mode) ? requestBody.mode : 'all'
+    const topic = typeof requestBody?.topic === 'string' ? requestBody.topic.trim() : ''
     resumeId = requestBody?.resumeId || requestBody?.id
     if (!resumeId) throw new Error('Identifiant de document manquant.')
     const { data: resume, error: resumeError } = await supabase
@@ -44,14 +45,19 @@ Deno.serve(async request => {
       .single()
     if (resumeError || !resume) throw new Error('Document introuvable.')
 
-    const { data: file, error: fileError } = await supabase.storage.from('documents').download(resume.source_path)
-    if (fileError || !file) throw new Error('Impossible de lire le PDF.')
-
-    const pdfData = `data:application/pdf;base64,${toBase64(new Uint8Array(await file.arrayBuffer()))}`
     const geminiKey = Deno.env.get('GEMINI_API_KEY')
     if (!geminiKey) throw new Error('GEMINI_API_KEY n’est pas configuree.')
 
     const geminiModel = 'gemini-3.6-flash'
+    let contentPart
+    if (topic) {
+      contentPart = { text: `Sujet à étudier : ${topic}` }
+    } else {
+      const { data: file, error: fileError } = await supabase.storage.from('documents').download(resume.source_path)
+      if (fileError || !file) throw new Error('Impossible de lire le PDF.')
+      const pdfData = `data:application/pdf;base64,${toBase64(new Uint8Array(await file.arrayBuffer()))}`
+      contentPart = { inlineData: { mimeType: 'application/pdf', data: pdfData.split(',')[1] } }
+    }
     const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`, {
       method: 'POST',
       headers: {
@@ -60,8 +66,8 @@ Deno.serve(async request => {
       body: JSON.stringify({
         contents: [{
           parts: [
-            { inlineData: { mimeType: 'application/pdf', data: pdfData.split(',')[1] } },
-            { text: 'Produis un resume pedagogique en francais et un quiz de 5 questions. Reponds uniquement avec le JSON demande.' },
+            contentPart,
+            { text: `Produis un résumé pédagogique en français et un quiz de 5 questions à partir de ce contenu. ${topic ? 'Utilise des connaissances générales fiables sur le sujet.' : ''} Réponds uniquement avec le JSON demandé.` },
           ],
         }],
         generationConfig: {

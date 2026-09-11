@@ -11,6 +11,7 @@ import { Notes } from './Notes';
 import { Settings } from './Settings';
 import { ReviewBySubject } from './ReviewBySubject';
 import { Flashcards } from './Flashcards';
+import { TopicStudy } from './TopicStudy';
 import { Search, Bell, Menu } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
@@ -120,6 +121,7 @@ export function Dashboard() {
           <Route path="/resumes/:id" element={<ResumeDetail />} />
           <Route path="/review" element={<ReviewBySubject />} />
           <Route path="/flashcards" element={<Flashcards />} />
+          <Route path="/topic" element={<TopicStudy />} />
           <Route path="/quiz" element={<QuizList />} />
           <Route path="/quiz/:id" element={<QuizExecution />} />
           <Route path="/notes" element={<Notes />} />

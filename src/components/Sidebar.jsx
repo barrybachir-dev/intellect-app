@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, UploadCloud, FileText, Brain, FolderOpen, Settings, Sparkles, X, BookOpen, Layers } from 'lucide-react';
+import { LayoutDashboard, UploadCloud, FileText, Brain, FolderOpen, Settings, Sparkles, X, BookOpen, Layers, PenLine } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 export function Sidebar({ isOpen, onClose }) {
@@ -8,6 +8,7 @@ export function Sidebar({ isOpen, onClose }) {
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', path: '/dashboard' },
     { icon: <UploadCloud size={20} />, label: 'Importer un document', path: '/dashboard/upload' },
+    { icon: <PenLine size={20} />, label: 'Étudier un sujet', path: '/dashboard/topic' },
     { icon: <FileText size={20} />, label: 'Bibliothèque', path: '/dashboard/resumes' },
     { icon: <BookOpen size={20} />, label: 'Réviser par matière', path: '/dashboard/review' },
     { icon: <Layers size={20} />, label: 'Flashcards', path: '/dashboard/flashcards' },

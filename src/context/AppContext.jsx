@@ -291,6 +291,40 @@ export function AppProvider({ children }) {
     if (data?.generatedNote) setNotes(prev => [data.generatedNote, ...prev]);
   };
 
+  const generateTopic = async (topic, mode = 'all') => {
+    const { data: { user: authenticatedUser } } = await supabase.auth.getUser();
+    if (!authenticatedUser) throw new Error('Votre session a expire.');
+    if (!topic.trim()) throw new Error('Saisissez un sujet à étudier.');
+
+    const resumeId = crypto.randomUUID();
+    const { error: insertError } = await supabase.from('resumes').insert({
+      id: resumeId,
+      user_id: authenticatedUser.id,
+      title: topic.trim(),
+      source_path: `topic/${authenticatedUser.id}/${resumeId}`,
+    });
+    if (insertError) throw insertError;
+
+    const { data, error } = await supabase.functions.invoke('process-document', {
+      body: JSON.stringify({ resumeId, mode, topic: topic.trim() }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (error || data?.error) {
+      await supabase.from('resumes').update({ status: 'failed', error_message: error?.message || data.error }).eq('id', resumeId);
+      throw new Error(error?.message || data.error);
+    }
+
+    const [{ data: resume }, { data: quiz }] = await Promise.all([
+      supabase.from('resumes').select('*').eq('id', resumeId).single(),
+      supabase.from('quizzes').select('*').eq('resume_id', resumeId).maybeSingle(),
+    ]);
+    if (resume) setResumes(prev => [{ ...resume, pages: resume.page_count, time: new Date(resume.created_at).toLocaleDateString('fr-FR'), keypoints: resume.keypoints || [] }, ...prev]);
+    if (quiz) setQuizzes(prev => [{ ...quiz, resumeId: quiz.resume_id, questions: quiz.questions || [] }, ...prev]);
+    if (data.generatedNote) setNotes(prev => [data.generatedNote, ...prev]);
+    setUsage(prev => ({ ...prev, resumesCount: prev.resumesCount + 1 }));
+    return resumeId;
+  };
+
   const submitQuiz = async (quizId, scorePct) => {
     const { error } = await supabase.from('quizzes').update({ completed: true, score: scorePct }).eq('id', quizId);
     if (error) throw error;
@@ -333,7 +367,7 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword, resetPassword, updateAvatar, updateNotifications,
       user, setUser,
-      usage, canUpload, processDocument, generateForResume, submitQuiz,
+      usage, canUpload, processDocument, generateForResume, generateTopic, submitQuiz,
       resumes, quizzes, notes, addNote, recentActivity,
       stats,
     }}>
