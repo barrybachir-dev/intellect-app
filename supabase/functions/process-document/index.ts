@@ -35,6 +35,7 @@ Deno.serve(async request => {
     const requestBody = await request.json()
     const mode = ['summary', 'quiz', 'notes', 'all'].includes(requestBody?.mode) ? requestBody.mode : 'all'
     const topic = typeof requestBody?.topic === 'string' ? requestBody.topic.trim() : ''
+    const requestedSubject = typeof requestBody?.subject === 'string' ? requestBody.subject.trim() : ''
     resumeId = requestBody?.resumeId || requestBody?.id
     if (!resumeId) throw new Error('Identifiant de document manquant.')
     const { data: resume, error: resumeError } = await supabase
@@ -110,7 +111,7 @@ Deno.serve(async request => {
     if (!responseText) throw new Error('La reponse Gemini est vide.')
     const result = JSON.parse(responseText)
     const { error: updateError } = await supabase.from('resumes').update({
-      subject: result.subject,
+      subject: requestedSubject || result.subject,
       page_count: result.page_count,
       content: result.content,
       keypoints: result.keypoints,
@@ -132,7 +133,7 @@ Deno.serve(async request => {
       const { data: note, error: noteError } = await supabase.from('notes').insert({
         user_id: user.id,
         title: `Fiche : ${resume.title}`,
-        subject: result.subject,
+        subject: requestedSubject || result.subject,
         content: result.content,
       }).select().single()
       if (noteError) throw noteError

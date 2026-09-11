@@ -306,7 +306,7 @@ export function AppProvider({ children }) {
     if (data?.generatedNote) setNotes(prev => [data.generatedNote, ...prev]);
   };
 
-  const generateTopic = async (topic, mode = 'all') => {
+  const generateTopic = async (topic, mode = 'all', subject = '') => {
     const { data: { user: authenticatedUser } } = await supabase.auth.getUser();
     if (!authenticatedUser) throw new Error('Votre session a expire.');
     if (!topic.trim()) throw new Error('Saisissez un sujet à étudier.');
@@ -321,7 +321,7 @@ export function AppProvider({ children }) {
     if (insertError) throw insertError;
 
     const { data, error } = await supabase.functions.invoke('process-document', {
-      body: JSON.stringify({ resumeId, mode, topic: topic.trim() }),
+      body: JSON.stringify({ resumeId, mode, topic: topic.trim(), subject: subject.trim() }),
       headers: { 'Content-Type': 'application/json' },
     });
     if (error || data?.error) {
