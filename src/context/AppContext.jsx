@@ -364,6 +364,12 @@ export function AppProvider({ children }) {
     setNotes(prev => [newNote, ...prev]);
   };
 
+  const deleteNote = async (noteId) => {
+    const { error } = await supabase.from('notes').delete().eq('id', noteId);
+    if (error) throw error;
+    setNotes(prev => prev.filter(note => note.id !== noteId));
+  };
+
   // ────────── Stats ──────────
   const getAverageScore = () => {
     const completed = quizzes.filter(q => q.completed);
@@ -383,7 +389,7 @@ export function AppProvider({ children }) {
       isLoggedIn, authLoading, login, register, logout, updateProfile, updatePassword, resetPassword, updateAvatar, updateNotifications, updateExams, theme, toggleTheme,
       user, setUser,
       usage, canUpload, processDocument, generateForResume, generateTopic, submitQuiz,
-      resumes, quizzes, notes, addNote, recentActivity,
+      resumes, quizzes, notes, addNote, deleteNote, recentActivity,
       stats,
     }}>
       {children}

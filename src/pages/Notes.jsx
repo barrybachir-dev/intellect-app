@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { FolderOpen, Plus, X, BookOpen, Download } from 'lucide-react';
+import { FolderOpen, Plus, X, BookOpen, Download, Trash2 } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Toast } from '../components/Toast';
 import { useAppContext } from '../context/useAppContext';
 
 export function Notes() {
-  const { notes, addNote } = useAppContext();
+  const { notes, addNote, deleteNote } = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ title: '', subject: '', content: '' });
   const [selectedNote, setSelectedNote] = useState(null);
@@ -39,6 +39,17 @@ export function Notes() {
     link.click();
     URL.revokeObjectURL(url);
     setToast('Note exportée en Markdown.');
+  };
+
+  const handleDelete = async note => {
+    if (!window.confirm(`Supprimer la note « ${note.title} » ?`)) return;
+    try {
+      await deleteNote(note.id);
+      setSelectedNote(null);
+      setToast('Note supprimée.');
+    } catch (error) {
+      setToast(error.message || 'Impossible de supprimer la note.');
+    }
   };
 
   const notesBySubject = notes.reduce((acc, note) => {
@@ -176,9 +187,14 @@ export function Notes() {
             <h2 className="text-2xl font-bold" style={{ marginBottom: '1rem' }}>{selectedNote.title}</h2>
             <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>{selectedNote.content}</p>
             <div style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{selectedNote.date}</div>
-            <Button variant="secondary" onClick={() => downloadNote(selectedNote)} style={{ marginTop: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Download size={16} /> Exporter en Markdown
-            </Button>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1.25rem' }}>
+              <Button variant="secondary" onClick={() => downloadNote(selectedNote)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Download size={16} /> Exporter en Markdown
+              </Button>
+              <Button variant="secondary" onClick={() => handleDelete(selectedNote)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderColor: 'rgba(239, 68, 68, 0.4)', color: '#f87171' }}>
+                <Trash2 size={16} /> Supprimer
+              </Button>
+            </div>
           </Card>
         </div>
       )}
