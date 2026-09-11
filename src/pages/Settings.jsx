@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { User, CreditCard, Bell, Shield, Check, Sparkles, Lock } from 'lucide-react';
 import { Card } from '../components/Card';
@@ -69,13 +69,6 @@ export function Settings() {
   const [saved, setSaved] = useState(false);
   const [securityMessage, setSecurityMessage] = useState('');
   const [billingMessage, setBillingMessage] = useState('');
-
-  useEffect(() => {
-    const requestedTab = searchParams.get('tab');
-    if (requestedTab && ['profile', 'billing', 'security', 'notifications'].includes(requestedTab)) {
-      setActiveTab(requestedTab);
-    }
-  }, [searchParams]);
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
