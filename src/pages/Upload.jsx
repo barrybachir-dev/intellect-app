@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UploadCloud, Lock, Brain } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { Skeleton } from '../components/Skeleton';
 import { useAppContext } from '../context/useAppContext';
 
 export function Upload() {
@@ -129,6 +130,17 @@ export function Upload() {
               <span className="badge">Analyse du PDF</span>
               <span className="badge">Quiz généré</span>
             </div>
+            <div aria-label="Préparation du contenu" style={{ width: '100%', maxWidth: '560px', display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.75rem', padding: '1rem', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-input)', textAlign: 'left' }}>
+              <Skeleton width="35%" height="0.8rem" />
+              <Skeleton width="100%" />
+              <Skeleton width="92%" />
+              <Skeleton width="78%" />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.6rem', marginTop: '0.5rem' }}>
+                <Skeleton height="3rem" />
+                <Skeleton height="3rem" />
+                <Skeleton height="3rem" />
+              </div>
+            </div>
           </>
         ) : (
           <>
@@ -158,6 +170,8 @@ export function Upload() {
           70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 229, 255, 0); }
           100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
         }
+        .skeleton { background: linear-gradient(90deg, var(--bg-card-hover), var(--border-color), var(--bg-card-hover)); background-size: 200% 100%; animation: skeleton-shimmer 1.4s ease-in-out infinite; }
+        @keyframes skeleton-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
       `}</style>
     </div>
   );
