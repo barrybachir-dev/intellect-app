@@ -67,7 +67,7 @@ Deno.serve(async request => {
         contents: [{
           parts: [
             contentPart,
-            { text: `Produis un résumé pédagogique en français et un quiz de 5 questions à partir de ce contenu. ${topic ? 'Utilise des connaissances générales fiables sur le sujet.' : ''} Réponds uniquement avec le JSON demandé.` },
+            { text: `Produis un résumé pédagogique en français et un quiz de 5 questions à partir de ce contenu. Ajoute une explication courte pour chaque bonne réponse. ${topic ? 'Utilise des connaissances générales fiables sur le sujet.' : ''} Réponds uniquement avec le JSON demandé.` },
           ],
         }],
         generationConfig: {
@@ -86,6 +86,7 @@ Deno.serve(async request => {
                       q: { type: 'STRING' },
                       options: { type: 'ARRAY', items: { type: 'STRING' }, minItems: 4, maxItems: 4 },
                       answer: { type: 'INTEGER', minimum: 0, maximum: 3 },
+                      explanation: { type: 'STRING' },
                     },
                     required: ['q', 'options', 'answer'],
                   },

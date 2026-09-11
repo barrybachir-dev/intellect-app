@@ -101,6 +101,12 @@ export function QuizExecution() {
           ))}
         </div>
 
+        {selectedOption !== null && currentQuestion.explanation && (
+          <div style={{ padding: '1rem', marginBottom: '1.5rem', borderRadius: 'var(--radius-md)', backgroundColor: 'rgba(0, 229, 255, 0.08)', border: '1px solid rgba(0, 229, 255, 0.25)', color: 'var(--text-secondary)' }}>
+            <strong style={{ color: 'var(--accent-cyan)' }}>À retenir : </strong>{currentQuestion.explanation}
+          </div>
+        )}
+
         <Button 
           variant="primary" 
           style={{ width: '100%', padding: '1rem' }} 
