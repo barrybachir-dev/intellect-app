@@ -16,14 +16,17 @@ import { useAppContext } from '../context/AppContext';
 export function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const { user } = useAppContext();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const { user, logout } = useAppContext();
   const navigate = useNavigate();
 
   const initials = user.firstName && user.lastName
     ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
     : user.firstName
     ? user.firstName[0].toUpperCase()
-    : '?';
+    : user.email
+    ? user.email[0].toUpperCase()
+    : 'U';
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--bg-color)', overflowX: 'hidden' }}>
@@ -81,7 +84,8 @@ export function Dashboard() {
               type="button"
               title={user.firstName ? `${user.firstName} ${user.lastName}` : 'Profil'}
               aria-label="Ouvrir mon profil"
-              onClick={() => navigate('/dashboard/settings')}
+              aria-expanded={profileOpen}
+              onClick={() => { setProfileOpen(open => !open); setNotificationsOpen(false); }}
               style={{
                 width: '2.5rem', height: '2.5rem', borderRadius: '50%',
                 background: 'var(--gradient-primary)',
@@ -91,6 +95,20 @@ export function Dashboard() {
             >
               {initials}
             </button>
+            {profileOpen && (
+              <div style={{ position: 'absolute', top: '3.5rem', right: '2rem', width: '230px', padding: '0.75rem', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', boxShadow: '0 12px 30px rgba(0,0,0,0.25)', zIndex: 20 }}>
+                <div style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.5rem' }}>
+                  <div style={{ fontWeight: 'bold' }}>{user.firstName || 'Mon profil'} {user.lastName}</div>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.2rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email || 'Compte connecté'}</div>
+                </div>
+                <button type="button" onClick={() => { setProfileOpen(false); navigate('/dashboard/settings'); }} style={{ display: 'block', width: '100%', padding: '0.65rem 0.75rem', textAlign: 'left', border: 0, borderRadius: 'var(--radius-sm)', background: 'transparent', color: 'var(--text-primary)', cursor: 'pointer' }}>
+                  Paramètres du profil
+                </button>
+                <button type="button" onClick={logout} style={{ display: 'block', width: '100%', padding: '0.65rem 0.75rem', textAlign: 'left', border: 0, borderRadius: 'var(--radius-sm)', background: 'transparent', color: '#f87171', cursor: 'pointer' }}>
+                  Se déconnecter
+                </button>
+              </div>
+            )}
           </div>
         </header>
 
