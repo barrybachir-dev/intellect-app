@@ -1,6 +1,6 @@
-# StudyAI
+# Intellect
 
-Application React/Vite de revision avec authentification Supabase, stockage prive des PDF et generation de supports pedagogiques via Google Gemini.
+Application React/Vite de revision avec authentification Supabase, stockage prive des PDF et creation de supports pedagogiques a partir de documents ou de sujets saisis directement.
 
 ## Configuration locale
 
@@ -31,8 +31,21 @@ L'URL de redirection OAuth doit inclure l'URL locale (`http://localhost:5173/das
 - Les sessions sont gerees par Supabase Auth.
 - Les profils, resumes, quiz et notes sont stockes dans PostgreSQL avec RLS.
 - Les PDF sont places dans un bucket prive, dans un dossier identifie par l'utilisateur.
-- La fonction `process-document` utilise la cle Gemini cote serveur uniquement, puis ecrit le resume et le quiz en base.
+- La fonction `process-document` utilise la cle de traitement cote serveur uniquement, puis ecrit les resultats en base.
+- L'utilisateur peut choisir un resume, un quiz, des notes ou tout a la fois.
+- Les contenus peuvent etre crees depuis un PDF ou depuis un sujet saisi directement.
+- La bibliotheque, les flashcards, la progression, l'examen blanc et le calendrier utilisent les donnees du compte.
 - Aucun contenu de demonstration n'est genere dans le navigateur.
+
+## Modules disponibles
+
+- Import de documents et bibliotheque personnelle.
+- Etude d'un sujet sans PDF.
+- Resumes, quiz, notes et flashcards.
+- Progression fondee sur les activites reelles.
+- Examen blanc chronometre.
+- Calendrier des examens, devoirs et revisions.
+- Mode clair/sombre et preferences de notifications.
 
 ## Verification
 
