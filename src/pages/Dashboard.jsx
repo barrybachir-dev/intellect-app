@@ -72,7 +72,7 @@ export function Dashboard() {
             </form>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
             <button type="button" aria-label={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'} onClick={toggleTheme} style={{ display: 'flex', cursor: 'pointer', color: 'var(--text-secondary)' }}>
               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -113,7 +113,7 @@ export function Dashboard() {
               {user.avatarUrl ? <img src={user.avatarUrl} alt="Profil" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} /> : initials}
             </button>
             {profileOpen && (
-              <div style={{ position: 'absolute', top: '3.5rem', right: '2rem', width: '230px', padding: '0.75rem', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', boxShadow: '0 12px 30px rgba(0,0,0,0.25)', zIndex: 20 }}>
+              <div style={{ position: 'absolute', top: '3.5rem', right: 0, width: '230px', padding: '0.75rem', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', boxShadow: '0 12px 30px rgba(0,0,0,0.25)', zIndex: 20 }}>
                 <div style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.5rem' }}>
                   <div style={{ fontWeight: 'bold' }}>{user.firstName || 'Mon profil'} {user.lastName}</div>
                   <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.2rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email || 'Compte connecté'}</div>

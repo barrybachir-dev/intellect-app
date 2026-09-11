@@ -40,7 +40,7 @@ export function Calendar() {
         <p style={{ color: 'var(--text-secondary)' }}>Garde tes examens et devoirs importants au même endroit.</p>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(260px, 0.8fr) minmax(320px, 1.2fr)', gap: '1.5rem', alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
         <Card style={{ padding: '1.5rem' }}>
           <h2 className="text-xl font-bold" style={{ marginBottom: '1.25rem' }}>Ajouter un événement</h2>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
